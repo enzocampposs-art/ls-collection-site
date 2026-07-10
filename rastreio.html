@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rastrear Pedido — LS Collection</title>
+  <meta name="description" content="Rastreie seu pedido da LS Collection. Acompanhe sua camisa em tempo real pelos Correios." />
+  <meta name="theme-color" content="#0E0E10" />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <div class="announce">
+    <div class="announce__track">
+      <span>PROMOÇÃO ATIVA</span><span class="announce__dot">•</span>
+      <span>2 CAMISAS POR R$260</span><span class="announce__dot">•</span>
+      <span>QUALIDADE PREMIUM 1.1</span><span class="announce__dot">•</span>
+      <span>ENVIO COM RASTREIO PARA TODO O BRASIL</span><span class="announce__dot">•</span>
+      <span>PROMOÇÃO ATIVA</span><span class="announce__dot">•</span>
+      <span>2 CAMISAS POR R$260</span><span class="announce__dot">•</span>
+      <span>QUALIDADE PREMIUM 1.1</span><span class="announce__dot">•</span>
+      <span>ENVIO COM RASTREIO PARA TODO O BRASIL</span><span class="announce__dot">•</span>
+    </div>
+  </div>
+
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="index.html" class="brand" aria-label="LS Collection - início">
+        <img src="assets/logo.png" alt="LS Collection" class="brand__logo" />
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html" class="nav__link">Início</a>
+        <a href="index.html#colecao" class="nav__link">Camisas</a>
+        <a href="rastreio.html" class="nav__link nav__link--active">Rastrear Pedido</a>
+        <a href="index.html#sobre" class="nav__link">Sobre</a>
+        <a href="#" class="btn btn--gold nav__cta" data-wpp data-wpp-msg="Olá! Vim pelo site e quero saber mais sobre as camisas da LS Collection.">
+          <svg viewBox="0 0 24 24" class="ico-wpp" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
+          WhatsApp
+        </a>
+      </nav>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="trackpage">
+      <div class="trackpage__bg" aria-hidden="true"></div>
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Central de Rastreamento</span>
+          <h1 class="section-title">Rastreie seu <span class="txt-gold">pedido</span></h1>
+          <p class="section-desc">Digite o código de rastreio que você recebeu após a compra e acompanhe a viagem da sua camisa até você.</p>
+        </div>
+
+        <div class="track__panel">
+          <form class="track__form" id="trackForm" autocomplete="off">
+            <input type="text" id="trackInput" class="track__input" placeholder="Ex.: LB123456789BR" aria-label="Código de rastreio" maxlength="13" />
+            <button type="submit" class="btn btn--gold btn--lg">Rastrear</button>
+          </form>
+          <p class="track__hint" id="trackHint">O código tem 13 caracteres — 2 letras + 9 números + 2 letras.</p>
+
+          <div class="track__result" id="trackResult" hidden>
+            <div class="track__result-head">
+              <div>
+                <span class="track__result-label">Objeto</span>
+                <strong id="trackCode"></strong>
+              </div>
+              <span class="track__status-tag" id="trackStatusTag">Em trânsito</span>
+            </div>
+            <ul class="timeline" id="trackTimeline"></ul>
+            <div class="track__result-foot">
+              <a href="#" id="trackOfficial" target="_blank" rel="noopener" class="btn btn--dark">Ver detalhes nos Correios</a>
+              <a href="#" class="btn btn--ghost-dark" data-wpp data-wpp-msg="Olá! Tenho uma dúvida sobre o rastreio do meu pedido.">Falar no WhatsApp</a>
+            </div>
+            <p class="track__demo-note">Demonstração de layout. Na versão final, os status vêm direto da API dos Correios em tempo real.</p>
+          </div>
+        </div>
+
+        <div class="track__help">
+          <div class="track__help-item"><strong>Não recebeu o código?</strong><span>O rastreio é enviado por WhatsApp em até 1 dia útil após a postagem.</span></div>
+          <div class="track__help-item"><strong>Prazo de entrega</strong><span>Varia conforme a região. Todo envio sai com código de rastreamento.</span></div>
+          <div class="track__help-item"><strong>Qualquer dúvida</strong><span>Chama a gente no WhatsApp que a gente acompanha junto com você.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="assets/logo.png" alt="LS Collection" class="footer__logo" />
+        <p>Vista sua paixão. Mostre seu estilo.</p>
+      </div>
+      <nav class="footer__nav">
+        <h4>Categorias</h4>
+        <a href="index.html#colecao">Brasileirão</a>
+        <a href="index.html#colecao">Seleções</a>
+        <a href="index.html#colecao">Europeus</a>
+      </nav>
+      <nav class="footer__nav">
+        <h4>Institucional</h4>
+        <a href="index.html#sobre">Sobre nós</a>
+        <a href="rastreio.html">Rastrear pedido</a>
+        <a href="index.html#feedback">Feedback</a>
+      </nav>
+      <div class="footer__contact">
+        <h4>Atendimento</h4>
+        <a href="https://www.instagram.com/lscolletion00" target="_blank" rel="noopener">@lscolletion00</a>
+        <a href="#" data-wpp data-wpp-msg="Olá! Vim pelo site.">WhatsApp</a>
+        <span class="footer__muted">Seg. a Sáb.</span>
+      </div>
+    </div>
+    <div class="footer__bottom container">
+      <span>© <span id="year"></span> LS Collection. Todos os direitos reservados.</span>
+      <span class="footer__made">Feito com paixão ⚽</span>
+    </div>
+  </footer>
+
+  <a href="#" class="wpp-float" data-wpp data-wpp-msg="Olá! Vim pelo site da LS Collection." aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
+  </a>
+
+  <script src="js/script.js"></script>
+  <script src="js/rastreio.js"></script>
+</body>
+</html>

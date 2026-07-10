@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Produto — LS Collection</title>
+  <meta name="description" content="Camisa premium 1.1 da LS Collection — do P ao G1, envio com rastreio para todo o Brasil." />
+  <meta name="theme-color" content="#0E0E10" />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- Announcement bar -->
+  <div class="announce">
+    <div class="announce__track">
+      <span>PROMOÇÃO ATIVA</span><span class="announce__dot">•</span>
+      <span>2 CAMISAS POR R$260</span><span class="announce__dot">•</span>
+      <span>QUALIDADE PREMIUM 1.1</span><span class="announce__dot">•</span>
+      <span>ENVIO COM RASTREIO PARA TODO O BRASIL</span><span class="announce__dot">•</span>
+      <span>PROMOÇÃO ATIVA</span><span class="announce__dot">•</span>
+      <span>2 CAMISAS POR R$260</span><span class="announce__dot">•</span>
+      <span>QUALIDADE PREMIUM 1.1</span><span class="announce__dot">•</span>
+      <span>ENVIO COM RASTREIO PARA TODO O BRASIL</span><span class="announce__dot">•</span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="index.html" class="brand" aria-label="LS Collection - início">
+        <img src="assets/logo.png" alt="LS Collection" class="brand__logo" />
+      </a>
+
+      <form class="search" id="searchForm" role="search" action="index.html">
+        <svg viewBox="0 0 24 24" class="search__ico" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input type="search" id="searchInput" class="search__input" placeholder="Pesquisar produto" aria-label="Pesquisar produto" />
+      </form>
+
+      <nav class="nav" id="nav">
+        <a href="index.html#inicio" class="nav__link">Início</a>
+        <a href="index.html#colecao" class="nav__link">Camisas</a>
+        <a href="index.html#entrega" class="nav__link">Entrega</a>
+        <a href="rastreio.html" class="nav__link">Rastrear Pedido</a>
+        <a href="index.html#sobre" class="nav__link">Sobre</a>
+        <a href="#" class="btn btn--gold nav__cta" data-wpp data-wpp-msg="Olá! Vim pelo site e quero saber mais sobre as camisas da LS Collection.">
+          <svg viewBox="0 0 24 24" class="ico-wpp" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
+          WhatsApp
+        </a>
+      </nav>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section class="pdp">
+      <div class="container">
+        <nav class="pdp__crumb" aria-label="Você está em">
+          <a href="index.html">Início</a><span class="sep">/</span>
+          <a href="index.html#colecao">Camisas</a><span class="sep">/</span>
+          <span id="pdpCrumbTeam">Produto</span>
+        </nav>
+
+        <div class="pdp__grid">
+          <!-- Galeria (giro 360 no Corinthians / foto nos demais) via pdp.js -->
+          <div id="pdpGallery"></div>
+
+          <div class="pdp__info">
+            <span class="pdp__cat" id="pdpCat"></span>
+            <h1 class="pdp__title">Camisa do <span class="txt-gold" id="pdpTeam">—</span></h1>
+            <span class="pdp__eyebrow">Versão Premium 1.1 · do P ao G1</span>
+
+            <div class="price">
+              <div class="price__main">
+                <span class="price__label">A partir de</span>
+                <span class="price__value">R$ 140</span>
+                <span class="price__unit">/un.</span>
+              </div>
+              <div class="price__combo">
+                <span class="price__combo-tag">Combo</span>
+                <span class="price__combo-txt">2 camisas por <strong>R$ 260</strong></span>
+                <span class="price__save">Economize R$ 20</span>
+              </div>
+            </div>
+
+            <p class="pdp__desc">Camisa versão <strong>premium 1.1</strong>, a mais fiel ao original do mercado — tecido de alta performance, escudo e detalhes de alto padrão. Caimento perfeito, disponível do <strong>P ao G1</strong>. Vista sua paixão, mostre seu estilo.</p>
+
+            <div class="pdp__sizes-head">
+              <span>Escolha o tamanho</span>
+              <button class="pdp__guide" id="pdpSizeGuide" type="button">Guia de medidas</button>
+            </div>
+            <div class="pdp__sizes" id="pdpSizes">
+              <button class="pdp__size" type="button" data-size="P">P</button>
+              <button class="pdp__size" type="button" data-size="M">M</button>
+              <button class="pdp__size" type="button" data-size="G">G</button>
+              <button class="pdp__size" type="button" data-size="GG">GG</button>
+              <button class="pdp__size" type="button" data-size="G1">G1</button>
+            </div>
+
+            <div class="pdp__actions">
+              <a class="btn btn--gold btn--lg" id="pdpBuy" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" class="ico-wpp" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
+                Comprar no WhatsApp
+              </a>
+              <a class="btn btn--dark btn--lg" href="index.html#colecao">Ver mais camisas</a>
+            </div>
+
+            <div class="pdp__secure">
+              <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg> Compra segura</span>
+              <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg> Envio com rastreio</span>
+              <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 8.7l5.9-.9z"/></svg> Qualidade 1.1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal: guia de medidas -->
+  <div class="modal" id="sizeModal" role="dialog" aria-modal="true" aria-label="Guia de medidas">
+    <div class="modal__box">
+      <button class="modal__close" data-close type="button" aria-label="Fechar">×</button>
+      <h3>Guia de medidas</h3>
+      <p style="color:var(--ink-2);font-size:0.88rem;margin-bottom:16px;">Medidas aproximadas da peça (cm). Na dúvida sobre o caimento, chama a gente no WhatsApp que a gente te ajuda a escolher.</p>
+      <table class="sizetable">
+        <thead><tr><th>Tamanho</th><th>Largura</th><th>Comprimento</th></tr></thead>
+        <tbody>
+          <tr><td>P</td><td>50 cm</td><td>70 cm</td></tr>
+          <tr><td>M</td><td>53 cm</td><td>72 cm</td></tr>
+          <tr><td>G</td><td>56 cm</td><td>74 cm</td></tr>
+          <tr><td>GG</td><td>59 cm</td><td>76 cm</td></tr>
+          <tr><td>G1</td><td>62 cm</td><td>78 cm</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="assets/logo.png" alt="LS Collection" class="footer__logo" />
+        <p>Vista sua paixão. Mostre seu estilo.</p>
+      </div>
+      <nav class="footer__nav">
+        <h4>Categorias</h4>
+        <a href="index.html#colecao">Brasileirão</a>
+        <a href="index.html#colecao">Seleções</a>
+        <a href="index.html#colecao">Europeus</a>
+      </nav>
+      <nav class="footer__nav">
+        <h4>Institucional</h4>
+        <a href="index.html#sobre">Sobre nós</a>
+        <a href="index.html#entrega">Entrega e frete</a>
+        <a href="rastreio.html">Rastrear pedido</a>
+        <a href="index.html#feedback">Feedback</a>
+      </nav>
+      <div class="footer__contact">
+        <h4>Atendimento</h4>
+        <a href="https://www.instagram.com/lscolletion00" target="_blank" rel="noopener">@lscolletion00</a>
+        <a href="#" data-wpp data-wpp-msg="Olá! Vim pelo site.">WhatsApp</a>
+        <span class="footer__muted">Seg. a Sáb.</span>
+      </div>
+    </div>
+    <div class="footer__bottom container">
+      <span>© <span id="year"></span> LS Collection. Todos os direitos reservados.</span>
+      <span class="footer__made">Feito com paixão ⚽</span>
+    </div>
+  </footer>
+
+  <!-- Botão flutuante WhatsApp -->
+  <a href="#" class="wpp-float" data-wpp data-wpp-msg="Olá! Vim pelo site da LS Collection." aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
+  </a>
+
+  <script src="js/script.js"></script>
+  <script src="js/pdp.js"></script>
+</body>
+</html>
