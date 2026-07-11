@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Painel Administrativo — LS Collection</title>
+  <meta name="description" content="Área restrita para administradores da LS Collection." />
+  <meta name="theme-color" content="#141416" />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <!-- ===================== LOGIN (visual — TODO: backend real) ===================== -->
+  <div class="login" id="loginView">
+    <div class="login__card">
+      <img src="assets/logo.png" alt="LS Collection" class="login__logo" />
+      <h1 class="login__title">Painel <span class="gold">LS Collection</span></h1>
+      <p class="login__sub">Gestão da loja — vendas, pedidos, produtos e campanhas.</p>
+      <form id="loginForm" autocomplete="off">
+        <label class="field">
+          <span>E-mail</span>
+          <input type="email" id="loginEmail" placeholder="admin@lscollection.com.br" required />
+        </label>
+        <label class="field">
+          <span>Senha</span>
+          <input type="password" id="loginPass" placeholder="••••••••" required />
+        </label>
+        <button type="submit" class="btn-gold btn-block">Entrar no painel</button>
+      </form>
+      <p class="login__warn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        Área restrita para administradores
+      </p>
+      <a class="login__back" href="index.html">← Voltar para a loja</a>
+    </div>
+  </div>
+
+  <!-- ===================== PAINEL ===================== -->
+  <div class="app" id="appView" hidden>
+
+    <!-- Sidebar -->
+    <aside class="sb" id="sidebar" aria-label="Menu do painel">
+      <div class="sb__brand">
+        <img src="assets/logo.png" alt="LS Collection" />
+        <span>LS <b>Admin</b></span>
+      </div>
+      <nav class="sb__nav">
+        <button class="sb__item is-active" data-sec="dashboard" data-title="Dashboard">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg>
+          Dashboard
+        </button>
+        <button class="sb__item" data-sec="produtos" data-title="Produtos">
+          <svg viewBox="0 0 24 24"><path d="M16.5 3 12 5 7.5 3 3 6l2 3 2-.7V20h10V8.3l2 .7 2-3-4.5-3Z"/></svg>
+          Produtos
+        </button>
+        <button class="sb__item" data-sec="pedidos" data-title="Pedidos">
+          <svg viewBox="0 0 24 24"><path d="M6 3h12l1 5H5l1-5Z"/><path d="M5 8h14v13H5z"/><path d="M9 12h6"/></svg>
+          Pedidos
+        </button>
+        <button class="sb__item" data-sec="clientes" data-title="Clientes">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.6c2.9.4 5 2.7 5 5.4"/></svg>
+          Clientes
+        </button>
+        <button class="sb__item" data-sec="estoque" data-title="Estoque">
+          <svg viewBox="0 0 24 24"><path d="M3 8 12 3l9 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8Z"/><path d="M3 8h18"/><path d="M9 12h6v8H9z"/></svg>
+          Estoque
+        </button>
+        <button class="sb__item" data-sec="promocoes" data-title="Promoções">
+          <svg viewBox="0 0 24 24"><path d="m3 12 9-9 9 9-9 9-9-9Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+          Promoções
+        </button>
+        <button class="sb__item" data-sec="fretes" data-title="Fretes e Rastreios">
+          <svg viewBox="0 0 24 24"><path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+          Fretes e Rastreios
+        </button>
+        <button class="sb__item" data-sec="anuncios" data-title="Anúncios e Campanhas">
+          <svg viewBox="0 0 24 24"><path d="m3 11 12-6v14L3 13v-2Z"/><path d="M15 8.5c2 .5 3 1.8 3 3.5s-1 3-3 3.5"/><path d="M7 13.5V17a2 2 0 0 0 4 0v-2"/></svg>
+          Anúncios
+        </button>
+        <button class="sb__item" data-sec="relatorios" data-title="Relatórios">
+          <svg viewBox="0 0 24 24"><path d="M4 20V6"/><path d="M10 20v-9"/><path d="M16 20V4"/><path d="M22 20H2"/></svg>
+          Relatórios
+        </button>
+        <button class="sb__item" data-sec="config" data-title="Configurações">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 3h-4l-.4 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 21h4l.4-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z"/></svg>
+          Configurações
+        </button>
+      </nav>
+      <div class="sb__foot">
+        <a href="index.html">
+          <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+          Ver a loja
+        </a>
+      </div>
+    </aside>
+    <div class="sb-overlay" id="sbOverlay" aria-hidden="true"></div>
+
+    <!-- Área principal -->
+    <div class="main">
+      <header class="tb">
+        <button class="tb__menu" id="sbToggle" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span><span></span></button>
+        <h1 class="tb__title" id="tbTitle">Dashboard</h1>
+        <div class="tb__right">
+          <div class="tb__search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+            <input type="search" id="tbSearch" placeholder="Buscar no painel" aria-label="Buscar no painel" />
+          </div>
+          <button class="tb__bell" id="tbBell" aria-label="Notificações">
+            <svg viewBox="0 0 24 24"><path d="M18 16v-5a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+            <span class="tb__badge" id="tbBellCount">3</span>
+          </button>
+          <span class="tb__avatar" title="LS Collection">LS</span>
+          <button class="tb__exit" id="btnLogout">Sair</button>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <!-- DASHBOARD -->
+        <section class="panel is-active" data-panel="dashboard">
+          <div class="kpis" id="kpiGrid"><!-- KPIs via admin.js --></div>
+          <div class="duo">
+            <div class="card">
+              <div class="card__head"><h2>Vendas por mês</h2><span class="card__hint">últimos 12 meses · mock</span></div>
+              <div class="bars" id="dashVendas"></div>
+            </div>
+            <div class="card">
+              <div class="card__head"><h2>Mais vendidos</h2><span class="card__hint">30 dias · mock</span></div>
+              <div class="hbars" id="dashTop"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__head"><h2>Pedidos recentes</h2><button class="btn-line" data-goto="pedidos">Ver todos</button></div>
+            <div class="tablewrap"><table class="table" id="dashPedidos"></table></div>
+          </div>
+        </section>
+
+        <!-- PRODUTOS -->
+        <section class="panel" data-panel="produtos">
+          <div class="toolbar">
+            <input type="search" class="toolbar__search" id="prodSearch" placeholder="Buscar produto ou time" aria-label="Buscar produto" />
+            <select id="prodCat" class="toolbar__select" aria-label="Filtrar categoria">
+              <option value="todos">Todas as categorias</option>
+              <option value="brasileirao">Brasileirão</option>
+              <option value="selecoes">Seleções</option>
+              <option value="europeus">Europeus</option>
+            </select>
+            <button class="btn-gold" id="prodNew">+ Novo produto</button>
+          </div>
+          <div class="card">
+            <div class="tablewrap"><table class="table" id="prodTable"></table></div>
+            <p class="mocknote">Catálogo lido direto do site (script.js). Edições ficam só nesta sessão — serão conectadas ao backend.</p>
+          </div>
+        </section>
+
+        <!-- PEDIDOS -->
+        <section class="panel" data-panel="pedidos">
+          <div class="toolbar">
+            <div class="chips" id="pedFilter">
+              <button class="fchip is-active" data-st="todos">Todos</button>
+              <button class="fchip" data-st="Novo">Novo</button>
+              <button class="fchip" data-st="Pago">Pago</button>
+              <button class="fchip" data-st="Separando">Separando</button>
+              <button class="fchip" data-st="Enviado">Enviado</button>
+              <button class="fchip" data-st="Entregue">Entregue</button>
+              <button class="fchip" data-st="Cancelado">Cancelado</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="tablewrap"><table class="table" id="pedTable"></table></div>
+            <p class="mocknote">Pedidos fictícios para demonstração — serão conectados ao backend.</p>
+          </div>
+        </section>
+
+        <!-- CLIENTES -->
+        <section class="panel" data-panel="clientes">
+          <div class="card">
+            <div class="card__head"><h2>Clientes cadastrados</h2><span class="card__hint">mock</span></div>
+            <div class="tablewrap"><table class="table" id="cliTable"></table></div>
+          </div>
+        </section>
+
+        <!-- ESTOQUE -->
+        <section class="panel" data-panel="estoque">
+          <div class="card">
+            <div class="card__head"><h2>Estoque por produto</h2><span class="card__hint">P–G1 · mock · <b class="low">vermelho = repor</b></span></div>
+            <div class="tablewrap"><table class="table" id="estTable"></table></div>
+          </div>
+        </section>
+
+        <!-- PROMOÇÕES -->
+        <section class="panel" data-panel="promocoes">
+          <div class="promogrid">
+            <div class="card">
+              <div class="card__head"><h2>Promoção ativa</h2><span class="pill pill--on">No ar</span></div>
+              <p class="bignum">2 por <span class="gold">R$ 260</span></p>
+              <p class="cardtxt">Combo válido nas camisas de preço padrão (R$ 140). Cronômetro de 3 dias renovando automático no site.</p>
+              <button class="btn-line" data-toast="Edição da promoção será conectada ao backend.">Editar promoção</button>
+            </div>
+            <div class="card">
+              <div class="card__head"><h2>Cupom de desconto</h2><span class="pill">Rascunho</span></div>
+              <p class="bignum coupon">TORCIDA10</p>
+              <p class="cardtxt">10% off no primeiro pedido — casa com a newsletter "Entre pra torcida" do site.</p>
+              <button class="btn-line" data-toast="Ativação de cupom será conectada ao backend.">Ativar cupom</button>
+            </div>
+            <div class="card">
+              <div class="card__head"><h2>Banner principal</h2><span class="pill pill--on">No ar</span></div>
+              <img src="assets/banner.jpg" alt="Banner atual do site" class="bannerprev" />
+              <p class="cardtxt">Banner atual da home. Troca de arte via atualização do arquivo <code>assets/banner.jpg</code>.</p>
+              <button class="btn-line" data-toast="Troca de banner pelo painel será conectada ao backend.">Trocar banner</button>
+            </div>
+            <div class="card">
+              <div class="card__head"><h2>Produtos em destaque</h2><span class="card__hint">selo "Mais vendidos" no site</span></div>
+              <div class="taglist" id="promoDestaques"></div>
+              <p class="cardtxt">Gerencie o destaque na aba <b>Produtos</b> (botão ★).</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- FRETES -->
+        <section class="panel" data-panel="fretes">
+          <div class="card">
+            <div class="card__head"><h2>Envios e rastreios</h2><button class="btn-gold" id="fretRefresh">Atualizar rastreios</button></div>
+            <div class="tablewrap"><table class="table" id="fretTable"></table></div>
+            <p class="mocknote">Status fictícios — será conectado à API dos Correios / Melhor Envio.</p>
+          </div>
+        </section>
+
+        <!-- ANÚNCIOS -->
+        <section class="panel" data-panel="anuncios">
+          <div class="toolbar">
+            <h2 class="toolbar__title">Campanhas e ideias prontas</h2>
+            <button class="btn-gold" data-toast="Criação de campanha será conectada ao Meta Ads / Google Ads.">+ Criar campanha</button>
+          </div>
+          <div class="promogrid" id="adIdeas"><!-- ideias via admin.js --></div>
+          <div class="card">
+            <div class="card__head"><h2>Desempenho de campanhas</h2><span class="card__hint">mock</span></div>
+            <div class="tablewrap"><table class="table" id="campTable"></table></div>
+          </div>
+        </section>
+
+        <!-- RELATÓRIOS -->
+        <section class="panel" data-panel="relatorios">
+          <div class="duo">
+            <div class="card">
+              <div class="card__head"><h2>Vendas por mês</h2><span class="card__hint">mock</span></div>
+              <div class="bars" id="repVendas"></div>
+            </div>
+            <div class="card">
+              <div class="card__head"><h2>Origem dos clientes</h2><span class="card__hint">mock</span></div>
+              <div class="donutwrap">
+                <div class="donut" id="repOrigem"><span class="donut__hole" id="repOrigemTotal"></span></div>
+                <ul class="legend" id="repOrigemLegend"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="duo">
+            <div class="card">
+              <div class="card__head"><h2>Produtos mais vendidos</h2><span class="card__hint">mock</span></div>
+              <div class="hbars" id="repTop"></div>
+            </div>
+            <div class="card">
+              <div class="card__head"><h2>Pedidos por status</h2><span class="card__hint">mock</span></div>
+              <div class="statusgrid" id="repStatus"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CONFIGURAÇÕES -->
+        <section class="panel" data-panel="config">
+          <div class="duo">
+            <div class="card">
+              <div class="card__head"><h2>Dados da loja</h2></div>
+              <label class="field"><span>WhatsApp de vendas</span><input id="cfgWpp" disabled /></label>
+              <label class="field"><span>Instagram</span><input id="cfgInsta" disabled /></label>
+              <label class="field"><span>Atendimento</span><input value="Seg. a Sáb. · 9h às 18h" disabled /></label>
+            </div>
+            <div class="card">
+              <div class="card__head"><h2>Preços padrão</h2></div>
+              <label class="field"><span>Preço unitário</span><input id="cfgUnit" disabled /></label>
+              <label class="field"><span>Combo (2 camisas)</span><input id="cfgCombo" disabled /></label>
+              <p class="mocknote">Campos em leitura (vêm do site). Edição pelo painel será liberada com o backend.</p>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- script.js primeiro: reusa PRODUTOS/CONFIG reais do site (funções da home se auto-desativam aqui) -->
+  <script src="js/script.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

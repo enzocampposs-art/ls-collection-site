@@ -20,6 +20,11 @@
   if ($("pdpCat")) $("pdpCat").textContent = catLabel;
   if ($("pdpTeam")) $("pdpTeam").textContent = prod.team;
 
+  // preço por produto — combo 2x260 só vale no preço padrão (R$ 140)
+  const preco = prod.preco || Number(CONFIG.precoUnit);
+  if ($("pdpPrice")) $("pdpPrice").textContent = "R$ " + preco;
+  if ($("pdpCombo") && preco !== Number(CONFIG.precoUnit)) $("pdpCombo").hidden = true;
+
   // Galeria: giro 360 no Corinthians; foto única nos demais
   const gallery = $("pdpGallery");
   if (gallery) {

@@ -11,7 +11,8 @@ const CONFIG = {
 
 /* PRODUTOS — foto real de cada camisa em assets/.
    category: 'brasileirao' | 'selecoes' | 'europeus'
-   badge (opcional): 'Mais vendida' | 'Novidade' */
+   badge (opcional): 'Mais vendida' | 'Novidade' | 'Jogador' | 'Retrô'
+   preco (opcional): só quando difere dos R$ 140 padrão (combo 2x260 vale apenas no preço padrão) */
 const PRODUTOS = [
   { team: "Corinthians", category: "brasileirao", img: "assets/prod19.jpg", badge: "Mais vendida", top: true },
   { team: "Flamengo",    category: "brasileirao", img: "assets/prod35.jpg", badge: "Novidade", top: true },
@@ -32,6 +33,20 @@ const PRODUTOS = [
   { team: "Tottenham",   category: "europeus",    img: "assets/prod28.jpg" },
   { team: "Manchester City", category: "europeus", img: "assets/prod34.jpg" },
   { team: "AS Roma",     category: "europeus",    img: "assets/prod32.jpg" },
+  { team: "Argentina",   category: "selecoes",    img: "assets/prod39.jpg", badge: "Jogador", preco: 210 },
+  { team: "Barcelona Roxa", category: "europeus", img: "assets/prod40.jpg" },
+  { team: "Bayern Vermelha", category: "europeus", img: "assets/prod41.jpg", badge: "Jogador", preco: 170 },
+  { team: "Benfica",     category: "europeus",    img: "assets/prod42.jpg" },
+  { team: "Corinthians Retrô 1995", category: "brasileirao", img: "assets/prod43.jpg", badge: "Retrô", preco: 200 },
+  { team: "Corinthians Preta", category: "brasileirao", img: "assets/prod44.jpg", badge: "Jogador", preco: 210 },
+  { team: "Espanha",     category: "selecoes",    img: "assets/prod45.jpg", badge: "Jogador", preco: 210 },
+  { team: "França",      category: "selecoes",    img: "assets/prod46.jpg", badge: "Jogador", preco: 210 },
+  { team: "Japão",       category: "selecoes",    img: "assets/prod47.jpg" },
+  { team: "Palmeiras Branca", category: "brasileirao", img: "assets/prod48.jpg", badge: "Jogador", preco: 210 },
+  { team: "Palmeiras Verde", category: "brasileirao", img: "assets/prod49.jpg", badge: "Jogador", preco: 210 },
+  { team: "Santos Retrô 2012 Azul", category: "brasileirao", img: "assets/prod50.jpg", badge: "Retrô" },
+  { team: "Santos Retrô 2012 Branca", category: "brasileirao", img: "assets/prod51.jpg", badge: "Retrô" },
+  { team: "São Paulo Listrada", category: "brasileirao", img: "assets/prod52.jpg", badge: "Jogador", preco: 210 },
 ];
 
 const CAT_LABEL = { brasileirao: "Brasileirão", selecoes: "Seleção", europeus: "Europa" };
@@ -66,6 +81,9 @@ function renderCatalog() {
   grid.innerHTML = items.map((p) => {
     const msg = `Olá! Tenho interesse na camisa do ${p.team} (do P ao G1). Vi no site — ainda tem em estoque?`;
     const badge = p.badge ? `<span class="card__badge">${p.badge}</span>` : "";
+    const preco = p.preco || Number(CONFIG.precoUnit);
+    const combo = preco === Number(CONFIG.precoUnit)
+      ? `<span class="card__combo">2 por R$ ${CONFIG.precoCombo}</span>` : "";
     return `
       <article class="card">
         <a class="card__media" href="produto.html?team=${encodeURIComponent(p.team)}">
@@ -76,10 +94,10 @@ function renderCatalog() {
         <div class="card__body">
           <span class="card__cat">${CAT_LABEL[p.category] || ""}</span>
           <h3 class="card__team"><a href="produto.html?team=${encodeURIComponent(p.team)}">${p.team}</a></h3>
-          <span class="card__sizes">Tamanhos P · M · G · GG · G1</span>
+          <span class="card__sizes" aria-label="Tamanhos: P, M, G, GG e G1"><i>P</i><i>M</i><i>G</i><i>GG</i><i>G1</i></span>
           <div class="card__pricing">
-            <div class="card__price"><b>R$ ${CONFIG.precoUnit}</b><span>na unidade</span></div>
-            <span class="card__combo">2 por R$ ${CONFIG.precoCombo}</span>
+            <div class="card__price"><b>R$ ${preco}</b><span>na unidade</span></div>
+            ${combo}
           </div>
           <a class="card__buy" href="${waLink(msg)}" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
@@ -102,6 +120,19 @@ function revealCards() {
     });
   }, { threshold: 0.1 });
   cards.forEach((c) => io.observe(c));
+}
+
+/* Reveal suave on-scroll — mesmo padrão do revealCards, pra elementos estáticos.
+   A classe é adicionada via JS: sem JS, nada fica escondido. */
+function revealSoft(selector) {
+  const els = document.querySelectorAll(selector);
+  if (!els.length || !("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) { setTimeout(() => e.target.classList.add("is-in"), (i % 4) * 80); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach((el) => { el.classList.add("reveal-init"); io.observe(el); });
 }
 
 /* Depoimentos */
@@ -301,10 +332,22 @@ function initShirt360() {
     if (frames.length < 2) { if (hint) hint.style.display = "none"; return; } // sem frames -> mantém estático
     img.src = frames[0];
     img.setAttribute("draggable", "false");
-    if (hint) hint.textContent = "Arraste ou passe o mouse para girar ↔";
+    if (hint) hint.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7 3 12l5 5"/><path d="m16 7 5 5-5 5"/></svg> Arraste ou passe o mouse para girar';
     wrap.classList.add("is-360");
 
     const N = frames.length;
+    const HALF = Math.floor(N / 2); // meia volta: frente → costas
+
+    // indicador de ângulo (dots) — um por frame útil
+    const dotsEl = document.createElement("div");
+    dotsEl.className = "spin-dots";
+    dotsEl.setAttribute("aria-hidden", "true");
+    for (let i = 0; i <= HALF; i++) dotsEl.appendChild(document.createElement("i"));
+    wrap.appendChild(dotsEl);
+    const dots = Array.from(dotsEl.children);
+    const paintDots = (idx) => dots.forEach((d, k) => d.classList.toggle("on", k === idx));
+    paintDots(0);
+
     let target = 0, cur = 0, shown = 0, raf = null;
     // anima o índice suavemente até o alvo (evita "pulos" quando o mouse vai rápido)
     const render = () => {
@@ -312,15 +355,16 @@ function initShirt360() {
       if (Math.abs(target - cur) < 0.01) cur = target;
       let idx = Math.round(cur);
       if (idx < 0) idx = 0; else if (idx > N - 1) idx = N - 1;
-      if (idx !== shown) { shown = idx; img.src = frames[idx]; }
+      if (idx !== shown) { shown = idx; img.src = frames[idx]; paintDots(idx); }
       raf = Math.abs(target - cur) > 0.01 ? requestAnimationFrame(render) : null;
     };
     const kick = () => { if (raf == null) raf = requestAnimationFrame(render); };
     const setFromX = (clientX) => {
+      wrap.classList.add("is-used"); // esconde a dica depois do primeiro giro
       const r = wrap.getBoundingClientRect();
       let p = (clientX - r.left) / r.width;
       p = Math.max(0, Math.min(0.9999, p));
-      target = p * Math.floor(N / 2);   // meia volta: frente → costas (não "volta" pra frente)
+      target = p * HALF;   // meia volta: frente → costas (não "volta" pra frente)
       kick();
     };
     // desktop: passar o mouse gira; mobile: arrastar o dedo gira — tudo suavizado
@@ -354,7 +398,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const searchInput = document.getElementById("searchInput");
   searchInput?.addEventListener("input", (e) => { STATE.query = e.target.value; renderCatalog(); });
-  document.getElementById("searchForm")?.addEventListener("submit", (e) => { e.preventDefault(); renderCatalog(); scrollToCatalog(); });
+  document.getElementById("searchForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    // fora da home (produto/rastreio) não há catálogo: leva a busca pra home
+    if (!document.getElementById("catalogGrid")) {
+      const q = (searchInput?.value || "").trim();
+      window.location.href = "index.html" + (q ? "?q=" + encodeURIComponent(q) : "") + "#colecao";
+      return;
+    }
+    renderCatalog(); scrollToCatalog();
+  });
+
+  // busca vinda de outra página (?q=)
+  const qParam = new URLSearchParams(location.search).get("q");
+  if (qParam && document.getElementById("catalogGrid")) {
+    STATE.query = qParam;
+    if (searchInput) searchInput.value = qParam;
+    renderCatalog();
+    scrollToCatalog();
+  }
+
+  // entrada suave dos blocos ao rolar (depoimentos já renderizados acima)
+  revealSoft(".tcard, .catbanner, .howto__step, .ship__card, .review, .stat, .track__help-item");
 
   // formulário de rastreio da home -> página dedicada
   document.getElementById("trackHomeForm")?.addEventListener("submit", (e) => {

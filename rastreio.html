@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Rastrear Pedido — LS Collection</title>
   <meta name="description" content="Rastreie seu pedido da LS Collection. Acompanhe sua camisa em tempo real pelos Correios." />
   <meta name="theme-color" content="#0E0E10" />
@@ -32,14 +32,19 @@
       <a href="index.html" class="brand" aria-label="LS Collection - início">
         <img src="assets/logo.png" alt="LS Collection" class="brand__logo" />
       </a>
+      <form class="search" id="searchForm" role="search" action="index.html">
+        <svg viewBox="0 0 24 24" class="search__ico" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+        <input type="search" id="searchInput" class="search__input" placeholder="Pesquisar produto" aria-label="Pesquisar produto" />
+      </form>
       <nav class="nav" id="nav">
         <a href="index.html" class="nav__link">Início</a>
         <a href="index.html#colecao" class="nav__link">Camisas</a>
+        <a href="index.html#entrega" class="nav__link">Entrega</a>
         <a href="rastreio.html" class="nav__link nav__link--active">Rastrear Pedido</a>
         <a href="index.html#sobre" class="nav__link">Sobre</a>
         <a href="#" class="btn btn--gold nav__cta" data-wpp data-wpp-msg="Olá! Vim pelo site e quero saber mais sobre as camisas da LS Collection.">
           <svg viewBox="0 0 24 24" class="ico-wpp" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
-          WhatsApp
+          WhatsApp <span class="online-dot" aria-hidden="true"></span>
         </a>
       </nav>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
@@ -53,7 +58,7 @@
       <div class="trackpage__bg" aria-hidden="true"></div>
       <div class="container">
         <div class="section-head">
-          <span class="eyebrow">Central de Rastreamento</span>
+          <span class="eyebrow eyebrow--center">Central de Rastreamento</span>
           <h1 class="section-title">Rastreie seu <span class="txt-gold">pedido</span></h1>
           <p class="section-desc">Digite o código de rastreio que você recebeu após a compra e acompanhe a viagem da sua camisa até você.</p>
         </div>
@@ -95,34 +100,56 @@
     <div class="container footer__inner">
       <div class="footer__brand">
         <img src="assets/logo.png" alt="LS Collection" class="footer__logo" />
-        <p>Vista sua paixão. Mostre seu estilo.</p>
+        <p>Camisas de futebol premium 1.1 dos principais times do Brasil e do mundo — do P ao G1, com envio rastreado pra todo o país.</p>
+        <p class="footer__tagline">Vista sua paixão. Mostre seu estilo.</p>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/lscolletion00" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2-.1-1.3-.1-1.7-.1-4.9s0-3.6.1-4.9c.1-1.2.3-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4 1.3-.1 1.7-.1 4.9-.1Zm0 3.2A6.6 6.6 0 1 0 18.6 12 6.6 6.6 0 0 0 12 5.4Zm0 10.9A4.3 4.3 0 1 1 16.3 12 4.3 4.3 0 0 1 12 16.3Zm6.9-11.1a1.5 1.5 0 1 1-1.5-1.5 1.5 1.5 0 0 1 1.5 1.5Z"/></svg></a>
+          <a href="#" data-wpp data-wpp-msg="Olá! Vim pelo site da LS Collection." aria-label="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg></a>
+        </div>
       </div>
       <nav class="footer__nav">
         <h4>Categorias</h4>
         <a href="index.html#colecao">Brasileirão</a>
         <a href="index.html#colecao">Seleções</a>
         <a href="index.html#colecao">Europeus</a>
+        <a href="index.html#colecao">Mais vendidos</a>
       </nav>
       <nav class="footer__nav">
         <h4>Institucional</h4>
         <a href="index.html#sobre">Sobre nós</a>
+        <a href="index.html#como-funciona">Como funciona</a>
+        <a href="index.html#entrega">Entrega e frete</a>
         <a href="rastreio.html">Rastrear pedido</a>
-        <a href="index.html#feedback">Feedback</a>
+        <a href="index.html#faq">Trocas e devoluções</a>
+        <a href="index.html#faq">Dúvidas frequentes</a>
       </nav>
       <div class="footer__contact">
         <h4>Atendimento</h4>
         <a href="https://www.instagram.com/lscolletion00" target="_blank" rel="noopener">@lscolletion00</a>
-        <a href="#" data-wpp data-wpp-msg="Olá! Vim pelo site.">WhatsApp</a>
-        <span class="footer__muted">Seg. a Sáb.</span>
+        <a href="#" data-wpp data-wpp-msg="Olá! Vim pelo site.">WhatsApp: (11) 94773-9081</a>
+        <span class="footer__muted">Seg. a Sáb. · 9h às 18h</span>
+        <span class="footer__muted">São Paulo · SP — entrega no mesmo dia na capital</span>
       </div>
     </div>
+    <div class="footer__paystrip container">
+      <span class="footer__paystrip-label">Formas de pagamento</span>
+      <div class="footer__paychips">
+        <span class="footer__paychip">Pix</span>
+        <span class="footer__paychip">Visa</span>
+        <span class="footer__paychip">Mastercard</span>
+        <span class="footer__paychip">Elo</span>
+        <span class="footer__paychip">Hipercard</span>
+        <span class="footer__paychip">Boleto</span>
+      </div>
+      <span class="footer__ssl"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> Site protegido · SSL</span>
+    </div>
     <div class="footer__bottom container">
-      <span>© <span id="year"></span> LS Collection. Todos os direitos reservados.</span>
-      <span class="footer__made">Feito com paixão ⚽</span>
+      <span>© <span id="year"></span> LS Collection · Todos os direitos reservados · <span style="color:var(--gold-bright)">Compra 100% segura</span></span>
+      <span class="footer__made">Feito com paixão ⚽ · <a href="#" class="footer__top">Voltar ao topo ↑</a></span>
     </div>
   </footer>
 
-  <a href="#" class="wpp-float" data-wpp data-wpp-msg="Olá! Vim pelo site da LS Collection." aria-label="Falar no WhatsApp">
+  <a href="#" class="wpp-float" data-tip="Fala com a gente" data-wpp data-wpp-msg="Olá! Vim pelo site da LS Collection." aria-label="Falar no WhatsApp">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
   </a>
 
