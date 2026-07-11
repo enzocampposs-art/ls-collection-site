@@ -287,6 +287,12 @@
               <p class="mocknote">Campos em leitura (vêm do site). Edição pelo painel será liberada com o backend.</p>
             </div>
           </div>
+          <div class="card">
+            <div class="card__head"><h2>Conexão com a planilha</h2><span id="cfgApiStatus"></span></div>
+            <p class="cardtxt">Cole aqui a URL do App da Web gerada no Apps Script da planilha (guia em <code>saidas/guia-conexao-planilha.md</code>). Com a conexão ativa, o login passa a exigir a senha definida no Apps Script e pedidos, clientes, estoque, rastreios e relatórios são lidos direto da planilha.</p>
+            <label class="field"><span>URL do App da Web (termina em /exec)</span><input id="cfgApiUrl" placeholder="https://script.google.com/macros/s/…/exec" /></label>
+            <button class="btn-gold" id="cfgApiSave">Salvar conexão</button>
+          </div>
         </section>
 
       </main>

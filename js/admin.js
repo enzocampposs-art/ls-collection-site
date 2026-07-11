@@ -9,18 +9,46 @@
   const $ = (id) => document.getElementById(id);
   const money = (n) => "R$ " + Number(n).toLocaleString("pt-BR");
 
-  /* ---------- sessão (visual — TODO: autenticação real no backend) ---------- */
+  /* ---------- conexão com a planilha Google (Apps Script — ver scripts/planilha-painel.gs) ----------
+     Sem URL configurada, o painel roda em modo demonstração (login aberto + dados fictícios).
+     Com URL salva (aba Configurações), o login exige a senha definida no Apps Script
+     e as tabelas passam a ler a planilha de verdade. */
+  const API_KEY = "ls_admin_api";      // localStorage: URL /exec do Apps Script
+  const TOKEN_KEY = "ls_admin_token";  // sessionStorage: senha validada nesta sessão
   const SESSION_KEY = "ls_admin_logged";
 
-  function adminLogin(email, pass) {
-    // TODO backend: validar credenciais via API (POST /admin/login) e guardar token.
-    void email; void pass;
-    sessionStorage.setItem(SESSION_KEY, "1");
-    return true;
+  const apiUrl = () => (localStorage.getItem(API_KEY) || "").trim();
+  const apiToken = () => sessionStorage.getItem(TOKEN_KEY) || "";
+
+  async function apiGet(params) {
+    const url = apiUrl();
+    if (!url) return null;
+    const q = new URLSearchParams(params).toString();
+    const res = await fetch(url + (url.includes("?") ? "&" : "?") + q, { redirect: "follow" });
+    return res.json();
+  }
+
+  async function adminLogin(email, pass) {
+    void email; // reservado pra multiusuário no futuro
+    if (!apiUrl()) { // modo demonstração
+      sessionStorage.setItem(SESSION_KEY, "1");
+      return { ok: true, demo: true };
+    }
+    try {
+      const r = await apiGet({ action: "ping", token: pass });
+      if (r && r.ok) {
+        sessionStorage.setItem(SESSION_KEY, "1");
+        sessionStorage.setItem(TOKEN_KEY, pass);
+        return { ok: true };
+      }
+      return { ok: false, erro: "Senha incorreta. Confira a senha definida no Apps Script." };
+    } catch (err) {
+      return { ok: false, erro: "Não consegui falar com a planilha. Confira a URL em Configurações." };
+    }
   }
   function adminLogout() {
-    // TODO backend: invalidar token na API.
     sessionStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
   }
   function isLogged() { return sessionStorage.getItem(SESSION_KEY) === "1"; }
 
@@ -97,6 +125,107 @@
       { st: "Enviado", q: 6 }, { st: "Entregue", q: 41 }, { st: "Cancelado", q: 2 },
     ],
   };
+
+  /* ---------- dados reais da planilha → substituem os mocks ---------- */
+  function parseData(str) { // "dd/mm/aaaa" → Date
+    const m = String(str || "").match(/(\d{2})\/(\d{2})\/(\d{4})/);
+    return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+  }
+
+  function applySheetData(d) {
+    const MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const hoje = new Date();
+
+    /* pedidos */
+    const ped = (d.pedidos || []).map(p => ({
+      n: String(p.Numero || ""), cliente: String(p.Cliente || ""), prod: String(p.Produto || ""),
+      valor: Number(p.Valor) || 0, st: String(p.Status || "Novo"), frete: String(p.Frete || "—"),
+      data: String(p.Data || ""), rastreio: String(p.Rastreio || ""), transp: String(p.Transportadora || ""),
+      prazo: String(p.Prazo || ""),
+    })).reverse(); // mais recentes primeiro
+    if (ped.length) MOCK.pedidos = ped;
+
+    /* clientes */
+    const cli = (d.clientes || []).map(c => ({
+      nome: String(c.Nome || ""), cidade: String(c.Cidade || ""), pedidos: Number(c.Pedidos) || 0,
+      total: Number(c.TotalGasto) || 0, canal: String(c.Canal || "—"),
+    }));
+    if (cli.length) MOCK.clientes = cli;
+
+    /* estoque real (Produto | P M G GG G1) */
+    if ((d.estoque || []).length) MOCK.estoqueReal = d.estoque;
+
+    /* fretes = pedidos com rastreio ou a caminho */
+    const fr = ped.filter(p => p.rastreio || ["Separando", "Enviado"].includes(p.st)).map(p => ({
+      n: p.n, cod: p.rastreio || "aguardando postagem", transp: p.transp || "Correios",
+      prazo: p.prazo || "—", st: p.st === "Entregue" ? "Entregue" : (p.rastreio ? "Em trânsito" : p.st),
+    }));
+    if (fr.length) MOCK.fretes = fr;
+
+    if (ped.length) {
+      /* vendas por mês (últimos 12) */
+      const byMonth = {};
+      ped.forEach(p => {
+        const dt = parseData(p.data);
+        if (!dt || p.st === "Cancelado") return;
+        const k = dt.getFullYear() + "-" + dt.getMonth();
+        byMonth[k] = (byMonth[k] || 0) + p.valor;
+      });
+      const serie = [];
+      for (let i = 11; i >= 0; i--) {
+        const dt = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+        serie.push({ m: MESES[dt.getMonth()], v: byMonth[dt.getFullYear() + "-" + dt.getMonth()] || 0 });
+      }
+      if (serie.some(x => x.v > 0)) MOCK.vendasMes = serie;
+
+      /* mais vendidos (agrupa por produto, sem o tamanho) */
+      const byProd = {};
+      ped.forEach(p => {
+        if (p.st === "Cancelado") return;
+        const nome = p.prod.replace(/\s*\(.*\)\s*$/, "").trim() || "—";
+        byProd[nome] = (byProd[nome] || 0) + 1;
+      });
+      const top = Object.entries(byProd).map(([nome, qtd]) => ({ nome, qtd }))
+        .sort((a, b) => b.qtd - a.qtd).slice(0, 5);
+      if (top.length) MOCK.topProdutos = top;
+
+      /* pedidos por status */
+      const sts = ["Novo", "Pago", "Separando", "Enviado", "Entregue", "Cancelado"];
+      MOCK.statusResumo = sts.map(st => ({ st, q: ped.filter(p => p.st === st).length }));
+
+      /* KPIs calculáveis */
+      const mesAtual = ped.filter(p => { const dt = parseData(p.data); return dt && dt.getMonth() === hoje.getMonth() && dt.getFullYear() === hoje.getFullYear() && p.st !== "Cancelado"; });
+      const hojeStr = String(hoje.getDate()).padStart(2, "0") + "/" + String(hoje.getMonth() + 1).padStart(2, "0") + "/" + hoje.getFullYear();
+      MOCK.kpis[0].value = money(mesAtual.reduce((a, p) => a + p.valor, 0));
+      MOCK.kpis[0].delta = mesAtual.length + " pedidos no mês";
+      MOCK.kpis[1].value = String(ped.filter(p => p.data === hojeStr).length);
+      MOCK.kpis[1].delta = "na planilha";
+      MOCK.kpis[5].value = money(Math.round(mesAtual.reduce((a, p) => a + p.valor, 0) * 1.15));
+      MOCK.kpis[5].delta = "projeção do mês";
+    }
+    if (cli.length) {
+      MOCK.kpis[3].value = String(cli.length);
+      MOCK.kpis[3].delta = "na planilha";
+      /* origem dos clientes */
+      const CORES = ["#C9A24B", "#37d67a", "#5b9dd9", "#9f8cf0", "#d9b45b", "#e05561"];
+      const byCanal = {};
+      cli.forEach(c => { byCanal[c.canal] = (byCanal[c.canal] || 0) + 1; });
+      const total = cli.length;
+      MOCK.origem = Object.entries(byCanal).sort((a, b) => b[1] - a[1]).map(([canal, q], i) => ({
+        canal, pct: Math.round(q / total * 100), cor: CORES[i % CORES.length],
+      }));
+      MOCK.origemTotal = total;
+    }
+  }
+
+  async function fetchData() {
+    if (!apiUrl() || !apiToken()) return false;
+    try {
+      const d = await apiGet({ token: apiToken() });
+      if (d && d.ok) { applySheetData(d); return true; }
+    } catch (err) { /* mantém mocks */ }
+    return false;
+  }
 
   /* estado em memória da sessão (produtos) — TODO backend: persistir via API */
   const catalogo = (typeof PRODUTOS !== "undefined" ? PRODUTOS : []).map((p, i) => ({
@@ -242,14 +371,19 @@
     const t = $("estTable");
     if (!t) return;
     const sizes = ["P", "M", "G", "GG", "G1"];
-    t.innerHTML = `
-      <thead><tr><th>Produto</th>${sizes.map(s => `<th>${s}</th>`).join("")}<th>Total</th></tr></thead>
-      <tbody>${catalogo.filter(p => p.ativo).map(p => {
-        const qts = sizes.map((s, k) => (p.id * 3 + k * 5 + 2) % 11); // MOCK determinístico
-        const total = qts.reduce((a, b) => a + b, 0);
-        return `<tr><td><b>${p.team}</b></td>${qts.map(q =>
-          `<td ${q <= 2 ? 'style="color:#e05561;font-weight:700"' : ""}>${q}</td>`).join("")}<td><b>${total}</b></td></tr>`;
+    const head = `<thead><tr><th>Produto</th>${sizes.map(s => `<th>${s}</th>`).join("")}<th>Total</th></tr></thead>`;
+    const cell = (q) => `<td ${q <= 2 ? 'style="color:#e05561;font-weight:700"' : ""}>${q}</td>`;
+    if (MOCK.estoqueReal) { // dados reais da aba Estoque
+      t.innerHTML = head + `<tbody>${MOCK.estoqueReal.map(r => {
+        const qts = sizes.map(s => Number(r[s]) || 0);
+        return `<tr><td><b>${r.Produto || "—"}</b></td>${qts.map(cell).join("")}<td><b>${qts.reduce((a, b) => a + b, 0)}</b></td></tr>`;
       }).join("")}</tbody>`;
+      return;
+    }
+    t.innerHTML = head + `<tbody>${catalogo.filter(p => p.ativo).map(p => {
+      const qts = sizes.map((s, k) => (p.id * 3 + k * 5 + 2) % 11); // MOCK determinístico
+      return `<tr><td><b>${p.team}</b></td>${qts.map(cell).join("")}<td><b>${qts.reduce((a, b) => a + b, 0)}</b></td></tr>`;
+    }).join("")}</tbody>`;
   }
 
   function renderPromoDestaques() {
@@ -304,7 +438,7 @@
       return s;
     });
     donut.style.background = `conic-gradient(${stops.join(", ")})`;
-    if (hole) hole.innerHTML = `212<small>clientes</small>`;
+    if (hole) hole.innerHTML = `${MOCK.origemTotal || 212}<small>clientes</small>`;
     leg.innerHTML = MOCK.origem.map(o => `<li><i style="background:${o.cor}"></i>${o.canal}<b>${o.pct}%</b></li>`).join("");
   }
 
@@ -370,16 +504,23 @@
   document.addEventListener("DOMContentLoaded", () => {
     if (!$("loginView")) return; // só roda no admin.html
 
-    /* login */
-    $("loginForm")?.addEventListener("submit", (e) => {
+    /* login (valida a senha na planilha quando a conexão está configurada) */
+    $("loginForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (adminLogin($("loginEmail").value, $("loginPass").value)) {
-        showApp();
-        toast("Bem-vindo ao painel da LS Collection 👑");
-      }
+      const btn = e.target.querySelector("button[type=submit]");
+      if (btn) { btn.disabled = true; btn.textContent = "Entrando…"; }
+      const r = await adminLogin($("loginEmail").value, $("loginPass").value);
+      if (btn) { btn.disabled = false; btn.textContent = "Entrar no painel"; }
+      if (!r.ok) { toast(r.erro || "Não foi possível entrar."); return; }
+      showApp();
+      toast(r.demo ? "Painel em modo demonstração — conecte a planilha em Configurações." : "Bem-vindo ao painel da LS Collection 👑");
+      if (!r.demo) { const ok = await fetchData(); if (ok) { renderAll(); } }
     });
     $("btnLogout")?.addEventListener("click", () => { adminLogout(); showLogin(); });
-    if (isLogged()) showApp();
+    if (isLogged()) {
+      showApp();
+      fetchData().then(ok => { if (ok) renderAll(); });
+    }
 
     /* navegação */
     document.querySelectorAll(".sb__item").forEach(b => b.addEventListener("click", () => goSection(b.dataset.sec)));
@@ -432,10 +573,36 @@
       renderPedidos();
     });
 
-    /* fretes: atualização mock */
-    $("fretRefresh")?.addEventListener("click", () => {
-      toast("Rastreios atualizados (simulação) — API dos Correios entra na integração.");
+    /* fretes: relê a planilha quando conectado */
+    $("fretRefresh")?.addEventListener("click", async () => {
+      if (apiUrl() && apiToken()) {
+        const ok = await fetchData();
+        if (ok) { renderAll(); toast("Dados atualizados direto da planilha ✓"); }
+        else toast("Não consegui ler a planilha agora — tenta de novo.");
+      } else {
+        toast("Rastreios atualizados (simulação) — conecte a planilha em Configurações.");
+      }
     });
+
+    /* conexão com a planilha (Configurações) */
+    const cfgUrl = $("cfgApiUrl");
+    if (cfgUrl) cfgUrl.value = apiUrl();
+    updateApiStatus();
+    $("cfgApiSave")?.addEventListener("click", () => {
+      const v = (cfgUrl?.value || "").trim();
+      if (v && !/^https:\/\/script\.google\.com\/.+\/exec/.test(v)) {
+        toast("A URL deve ser a do App da Web (termina em /exec)."); return;
+      }
+      localStorage.setItem(API_KEY, v);
+      updateApiStatus();
+      toast(v ? "Planilha conectada! Saia e entre com a senha do Apps Script." : "Conexão removida — painel volta ao modo demonstração.");
+    });
+    function updateApiStatus() {
+      const s = $("cfgApiStatus");
+      if (s) s.innerHTML = apiUrl()
+        ? '<span class="pill pill--on">Conectado à planilha</span>'
+        : '<span class="pill">Modo demonstração</span>';
+    }
 
     /* notificações mock */
     $("tbBell")?.addEventListener("click", () => {
