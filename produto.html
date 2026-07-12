@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=4" />
 </head>
 <body>
 
@@ -104,11 +104,15 @@
             </div>
 
             <div class="pdp__actions">
-              <a class="btn btn--gold btn--lg" id="pdpBuy" href="#" target="_blank" rel="noopener">
+              <button class="btn btn--gold btn--lg" id="pdpCheckoutOpen" type="button">
+                <svg viewBox="0 0 24 24" class="ico-wpp" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 3h2l2.6 12.4a1 1 0 0 0 1 .6h8.8a1 1 0 0 0 1-.7L21 7H6"/></svg>
+                Finalizar compra
+              </button>
+              <a class="btn btn--dark btn--lg" id="pdpBuy" href="#" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" class="ico-wpp" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
                 Comprar no WhatsApp
               </a>
-              <a class="btn btn--dark btn--lg" href="index.html#colecao">Ver mais camisas</a>
+              <a class="pdp__more" href="index.html#colecao">Ver mais camisas →</a>
             </div>
 
             <div class="pdp__secure">
@@ -121,6 +125,66 @@
       </div>
     </section>
   </main>
+
+  <!-- Modal: checkout (produto → dados → resumo → pagamento externo/WhatsApp) -->
+  <div class="modal" id="checkoutModal" role="dialog" aria-modal="true" aria-label="Finalizar compra">
+    <div class="modal__box modal__box--ck">
+      <button class="modal__close" data-close type="button" aria-label="Fechar">×</button>
+      <h3>Finalizar compra</h3>
+
+      <div class="ck__product" id="ckProduct"><!-- via checkout.js --></div>
+
+      <div class="ck__grid">
+        <label class="ck__field"><span>Nome *</span><input id="ckNome" type="text" placeholder="Seu nome completo" autocomplete="name" /></label>
+        <label class="ck__field"><span>Telefone (WhatsApp) *</span><input id="ckTelefone" type="tel" placeholder="(11) 91234-5678" autocomplete="tel" /></label>
+        <label class="ck__field"><span>Cidade</span><input id="ckCidade" type="text" placeholder="São Paulo/SP" autocomplete="address-level2" /></label>
+        <label class="ck__field"><span>CEP (calcula o frete)</span><input id="ckCep" type="text" inputmode="numeric" placeholder="01310-100" autocomplete="postal-code" /></label>
+      </div>
+
+      <div class="ck__row">
+        <div class="ck__qty-wrap">
+          <span class="ck__label">Quantidade</span>
+          <div class="ck__qty">
+            <button type="button" id="ckQtyMinus" aria-label="Diminuir">−</button>
+            <input id="ckQty" value="1" readonly aria-label="Quantidade" />
+            <button type="button" id="ckQtyPlus" aria-label="Aumentar">+</button>
+          </div>
+        </div>
+        <div class="ck__pay-wrap">
+          <span class="ck__label">Forma de pagamento</span>
+          <div class="ck__pay-opts" id="ckPayOpts">
+            <button type="button" class="ck__pay-chip is-active" data-pay="pix">Pix</button>
+            <button type="button" class="ck__pay-chip" data-pay="credito">Cartão de crédito</button>
+            <button type="button" class="ck__pay-chip" data-pay="debito">Cartão de débito</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ck__pix" id="ckPixBox" hidden>
+        <div class="ck__pix-txt">
+          <span>Chave Pix (<b id="ckPixNome"></b>)</span>
+          <code id="ckPixKey"></code>
+        </div>
+        <button type="button" class="btn btn--dark" id="ckPixCopy">Copiar chave</button>
+      </div>
+
+      <div class="ck__resumo" id="ckResumo"><!-- via checkout.js --></div>
+
+      <p class="ck__hint" id="ckHint" hidden>Preencha <b>nome</b>, <b>telefone</b> e escolha o <b>tamanho</b> na página pra continuar.</p>
+
+      <div class="ck__actions">
+        <button type="button" class="btn btn--gold btn--lg" id="ckWpp">
+          <svg viewBox="0 0 24 24" class="ico-wpp" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
+          Finalizar pelo WhatsApp
+        </button>
+      </div>
+
+      <p class="ck__secure-note">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <b>Não pedimos dados de cartão no site.</b>&nbsp;Pix: pague pela chave e envie o comprovante. Cartão: a loja envia a cobrança segura pelo WhatsApp.
+      </p>
+    </div>
+  </div>
 
   <!-- Modal: guia de medidas -->
   <div class="modal" id="sizeModal" role="dialog" aria-modal="true" aria-label="Guia de medidas">
@@ -200,7 +264,8 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
   </a>
 
-  <script src="js/script.js"></script>
-  <script src="js/pdp.js"></script>
+  <script src="js/script.js?v=4"></script>
+  <script src="js/pdp.js?v=4"></script>
+  <script src="js/checkout.js?v=4"></script>
 </body>
 </html>

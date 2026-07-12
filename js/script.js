@@ -7,7 +7,19 @@ const CONFIG = {
   instagram: "https://www.instagram.com/lscolletion00?igsh=OHdydXhhOW96NGd6&utm_source=qr",
   precoUnit: "140",
   precoCombo: "260",
+
+  /* Pagamento (checkout em produto.html) — fluxo 100% via WhatsApp.
+     Pix: a chave vai na própria mensagem. Cartão: o vendedor envia o
+     link/cobrança pelo WhatsApp. (APIs de pagamento ficam pro futuro.) */
+  pixChave: "lscolletion.financeiro@gmail.com", // chave Pix da loja (e-mail)
+  pixRecebedor: "LS Collection",
 };
+
+/* slug de time pra URLs: "Real Madrid" -> "real-madrid" (aceita acentos) */
+function slugTeam(s) {
+  return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
 
 /* PRODUTOS — foto real de cada camisa em assets/.
    category: 'brasileirao' | 'selecoes' | 'europeus'
@@ -79,27 +91,27 @@ function renderCatalog() {
   if (empty) empty.hidden = items.length !== 0;
 
   grid.innerHTML = items.map((p) => {
-    const msg = `Olá! Tenho interesse na camisa do ${p.team} (do P ao G1). Vi no site — ainda tem em estoque?`;
     const badge = p.badge ? `<span class="card__badge">${p.badge}</span>` : "";
     const preco = p.preco || Number(CONFIG.precoUnit);
     const combo = preco === Number(CONFIG.precoUnit)
       ? `<span class="card__combo">2 por R$ ${CONFIG.precoCombo}</span>` : "";
+    const url = `produto.html?team=${slugTeam(p.team)}`;
     return `
       <article class="card">
-        <a class="card__media" href="produto.html?team=${encodeURIComponent(p.team)}">
+        <a class="card__media" href="${url}">
           <span class="card__quality">Premium 1.1</span>
           ${badge}
           <img src="${p.img}" alt="Camisa do ${p.team} — LS Collection" loading="lazy" />
         </a>
         <div class="card__body">
           <span class="card__cat">${CAT_LABEL[p.category] || ""}</span>
-          <h3 class="card__team"><a href="produto.html?team=${encodeURIComponent(p.team)}">${p.team}</a></h3>
+          <h3 class="card__team"><a href="${url}">${p.team}</a></h3>
           <span class="card__sizes" aria-label="Tamanhos: P, M, G, GG e G1"><i>P</i><i>M</i><i>G</i><i>GG</i><i>G1</i></span>
           <div class="card__pricing">
             <div class="card__price"><b>R$ ${preco}</b><span>na unidade</span></div>
             ${combo}
           </div>
-          <a class="card__buy" href="${waLink(msg)}" target="_blank" rel="noopener">
+          <a class="card__buy" href="${url}&ck=1">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 15l-1.3 5 5.1-1.3A10 10 0 1 0 12 2Zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.6-.6-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 1.9c.1.2.1.4 0 .6l-.3.5-.4.4c-.1.1-.3.3-.1.6.1.3.7 1.1 1.4 1.8.9.8 1.7 1.1 2 1.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.3.1.6-.1 1.5Z"/></svg>
             Comprar no WhatsApp
           </a>
@@ -197,10 +209,11 @@ const FRETE = {
   // TODO Melhor Envio: CEP de origem da loja (de onde as camisas saem).
   cepOrigem: "01000000",
   // Faixas SIMULADAS — trocar pelos valores/prazos reais retornados pela API.
+  // valorNum = mesmo valor de "valor", em número, usado no total do checkout.
   faixas: {
-    capital:  { regiao: "Capital de São Paulo",        prazo: "Hoje — entrega no mesmo dia", valor: "a partir de R$ 19,90" },
-    grandesp: { regiao: "ABC / Grande São Paulo",       prazo: "Expressa — 1 a 2 dias úteis", valor: "a partir de R$ 14,90" },
-    brasil:   { regiao: "Demais regiões do Brasil",     prazo: "5 a 10 dias úteis",           valor: "a partir de R$ 24,90" },
+    capital:  { regiao: "Capital de São Paulo",        prazo: "Hoje — entrega no mesmo dia", valor: "a partir de R$ 19,90", valorNum: 19.90 },
+    grandesp: { regiao: "ABC / Grande São Paulo",       prazo: "Expressa — 1 a 2 dias úteis", valor: "a partir de R$ 14,90", valorNum: 14.90 },
+    brasil:   { regiao: "Demais regiões do Brasil",     prazo: "5 a 10 dias úteis",           valor: "a partir de R$ 24,90", valorNum: 24.90 },
   },
 };
 

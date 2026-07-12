@@ -9,7 +9,9 @@
   const teamParam = (params.get("team") || "").toLowerCase();
 
   const list = (typeof PRODUTOS !== "undefined") ? PRODUTOS : [];
-  const prod = list.find((p) => p.team.toLowerCase() === teamParam) || list[0];
+  /* aceita "Real Madrid", "real madrid" e "real-madrid" */
+  const norm = (typeof slugTeam === "function") ? slugTeam : ((s) => String(s).toLowerCase());
+  const prod = list.find((p) => p.team.toLowerCase() === teamParam || norm(p.team) === norm(teamParam)) || list[0];
   if (!prod) return;
 
   const isCorinthians = prod.team.toLowerCase() === "corinthians";
@@ -50,12 +52,12 @@
   const sizes = $("pdpSizes");
   const cta = $("pdpBuy");
 
-  function updateCta() {
-    const s = size ? (" no tamanho " + size) : "";
-    const msg = "Olá! Quero a camisa do " + prod.team + s + " (LS Collection). Ainda tem em estoque?";
-    if (cta && typeof waLink === "function") cta.setAttribute("href", waLink(msg));
-  }
-  updateCta();
+  /* o botão "Comprar no WhatsApp" abre o checkout — a mensagem completa
+     (nº do pedido, valores, forma de pagamento) é montada pelo checkout.js */
+  if (cta) cta.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.getElementById("pdpCheckoutOpen")?.click();
+  });
 
   if (sizes) {
     sizes.addEventListener("click", (e) => {
@@ -63,7 +65,6 @@
       if (!b) return;
       size = b.dataset.size;
       sizes.querySelectorAll(".pdp__size").forEach((x) => x.classList.toggle("is-active", x === b));
-      updateCta();
     });
   }
 

@@ -44,6 +44,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; } /* hidden sempre vence classes com display (flex/grid) */
 html { scroll-behavior: smooth; scroll-padding-top: 150px; scrollbar-width: thin; scrollbar-color: rgba(201,162,75,.5) transparent; }
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -80,6 +81,60 @@ html { scroll-behavior: smooth; scroll-padding-top: 150px; scrollbar-width: thin
 .modal__close { position:absolute; top:6px; right:8px; background:none; border:none; font-size:1.7rem; cursor:pointer; color:var(--muted); line-height:1; width:44px; height:44px; display:flex; align-items:center; justify-content:center; }
 .modal__note { color: var(--ink-2); font-size: 0.88rem; margin-bottom: 16px; }
 .modal h3 { margin-bottom:12px; }
+
+/* ===== Checkout (produto.html) — premium, sem captura de cartão ===== */
+.modal__box--ck { max-width: 700px; }
+.pdp__more { display: inline-flex; align-items: center; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; color: var(--gold); padding: 12px 4px; }
+.pdp__more:hover { color: var(--gold-bright); }
+
+.ck__product { display: flex; align-items: center; gap: 14px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg-2); margin-bottom: 18px; }
+.ck__product img { width: 62px; height: 62px; object-fit: contain; border-radius: 8px; background: #fff; }
+.ck__product-txt { display: flex; flex-direction: column; gap: 2px; }
+.ck__product-txt strong { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+.ck__product-txt span { color: var(--ink-2); font-size: 0.85rem; }
+
+.ck__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-bottom: 16px; }
+.ck__field { display: flex; flex-direction: column; gap: 6px; }
+.ck__field span { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; color: var(--ink-2); }
+.ck__field input { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 1rem; background: #fff; color: var(--ink); min-height: 46px; }
+.ck__field input:focus { outline: none; border-color: var(--gold); box-shadow: var(--ring); }
+
+.ck__row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 16px; }
+.ck__label { display: block; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 0.7rem; color: var(--ink-2); margin-bottom: 7px; }
+.ck__qty { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 50px; overflow: hidden; background: #fff; }
+.ck__qty button { width: 44px; height: 44px; border: 0; background: transparent; font-size: 1.3rem; cursor: pointer; color: var(--ink); }
+.ck__qty button:hover { background: var(--bg-2); }
+.ck__qty input { width: 46px; height: 44px; border: 0; text-align: center; font: inherit; font-weight: 700; background: transparent; }
+.ck__pay-wrap { flex: 1; min-width: 240px; }
+.ck__pay-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.ck__pay-chip { border: 1px solid var(--line); border-radius: 50px; background: #fff; padding: 11px 16px; min-height: 44px; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.6px; font-size: 0.76rem; color: var(--ink-2); cursor: pointer; transition: .2s; }
+.ck__pay-chip:hover { border-color: var(--gold); color: var(--ink); }
+.ck__pay-chip.is-active { background: var(--dark); border-color: var(--dark); color: var(--gold-bright); }
+
+.ck__pix { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border: 1px dashed var(--gold); border-radius: 12px; background: rgba(201,162,75,.07); padding: 12px 14px; margin-bottom: 16px; }
+.ck__pix-txt { display: flex; flex-direction: column; gap: 3px; }
+.ck__pix-txt span { font-size: 0.8rem; color: var(--ink-2); }
+.ck__pix-txt code { font-weight: 700; font-size: 0.95rem; color: var(--ink); }
+
+.ck__resumo { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; background: var(--bg-2); }
+.ck__resumo-row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 0.92rem; color: var(--ink-2); }
+.ck__resumo-row span:last-child { text-align: right; color: var(--ink); }
+.ck__resumo-row--gold span { color: var(--gold) !important; font-weight: 600; }
+.ck__resumo-row--total { border-top: 1px solid var(--line); margin-top: 6px; padding-top: 10px; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; font-size: 1.05rem; }
+.ck__resumo-row--total span { color: var(--ink) !important; font-weight: 700; }
+
+.ck__hint { background: rgba(224,85,97,.08); border: 1px solid rgba(224,85,97,.35); color: #b4404b; border-radius: 10px; padding: 10px 14px; font-size: 0.86rem; margin-bottom: 14px; }
+.ck__actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.ck__actions .btn { flex: 1; min-width: 220px; }
+.ck__track { display: inline-flex; align-items: center; justify-content: center; width: 100%; margin-top: 12px; padding: 12px; border-radius: 50px; border: 1px solid var(--gold); color: var(--gold); font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 0.82rem; transition: .2s; }
+.ck__track:hover { background: rgba(201,162,75,.1); color: var(--gold-bright); }
+.ck__secure-note { display: flex; align-items: center; gap: 8px; margin-top: 14px; color: var(--muted); font-size: 0.78rem; }
+.ck__secure-note svg { width: 15px; height: 15px; flex-shrink: 0; fill: none; stroke: var(--gold); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 560px) {
+  .ck__grid { grid-template-columns: 1fr; }
+  .ck__actions .btn { min-width: 100%; }
+}
 .sizetable { width:100%; border-collapse:collapse; font-size:0.9rem; }
 .sizetable th, .sizetable td { border:1px solid var(--line); padding:9px 12px; text-align:center; }
 .sizetable th { background:var(--bg-2); font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.5px; }
