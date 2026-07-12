@@ -496,6 +496,211 @@
   }
 
   /* ============================================================
+     PINTOR DE ANÚNCIO — usado pela aba Nova Camisa (lançamentos)
+     ============================================================ */
+  const adCache = {};
+  const adLoadImg = (src) => new Promise((res) => {
+    if (adCache[src]) return res(adCache[src]);
+    const i = new Image();
+    i.onload = () => { adCache[src] = i; res(i); };
+    i.onerror = () => res(null);
+    i.src = src;
+  });
+
+  function adRoundRect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  }
+
+  /* desenha a arte de anúncio no padrão da marca (o = {story,gancho,titulo,badge,foto,preco,comboOk}) */
+  async function pintarAnuncio(cv, o) {
+    const W = 1080, H = o.story ? 1920 : 1350;
+    cv.width = W; cv.height = H;
+    const g = cv.getContext("2d");
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+    const logo = await adLoadImg("assets/logo.png");
+
+    const GOLD = "#C9A24B", GOLD2 = "#F3D98A", INK2 = "rgba(255,255,255,.72)";
+
+    g.fillStyle = "#0D0D10"; g.fillRect(0, 0, W, H);
+    const rg = g.createRadialGradient(W / 2, H * 0.44, 60, W / 2, H * 0.44, W * 0.78);
+    rg.addColorStop(0, "rgba(201,162,75,.26)"); rg.addColorStop(1, "rgba(201,162,75,0)");
+    g.fillStyle = rg; g.fillRect(0, 0, W, H);
+    const frame = g.createLinearGradient(0, 0, W, H);
+    frame.addColorStop(0, "#8A6D2B"); frame.addColorStop(.5, GOLD2); frame.addColorStop(1, "#B8891F");
+    g.strokeStyle = frame; g.lineWidth = 4; g.strokeRect(30, 30, W - 60, H - 60);
+
+    let y = o.story ? 110 : 82;
+    if (logo) {
+      const lw = 250, lh = lw * (logo.height / logo.width);
+      g.drawImage(logo, (W - lw) / 2, y, lw, lh);
+      y += lh + (o.story ? 50 : 30);
+    }
+
+    g.textAlign = "center";
+    if (o.gancho) {
+      g.fillStyle = GOLD2; g.font = "600 40px Oswald, sans-serif";
+      g.fillText(o.gancho.toUpperCase(), W / 2, y + 30); y += (o.story ? 72 : 58);
+    }
+
+    /* título com quebra */
+    g.fillStyle = "#fff";
+    let fs = 88; g.font = `700 ${fs}px Oswald, sans-serif`;
+    let linhas = [o.titulo];
+    if (g.measureText(o.titulo).width > W - 180) {
+      const pal = o.titulo.split(" "); const meio = Math.ceil(pal.length / 2);
+      linhas = [pal.slice(0, meio).join(" "), pal.slice(meio).join(" ")];
+      fs = 72; g.font = `700 ${fs}px Oswald, sans-serif`;
+      while (linhas.some(l => g.measureText(l).width > W - 180) && fs > 46) { fs -= 4; g.font = `700 ${fs}px Oswald, sans-serif`; }
+    }
+    linhas.forEach((l, i) => g.fillText(l, W / 2, y + fs * (i + 0.9)));
+    y += fs * linhas.length + (o.story ? 30 : 18);
+
+    /* badge (ex.: LANÇAMENTO · VERSÃO JOGADOR) */
+    if (o.badge) {
+      g.font = "600 30px Oswald, sans-serif";
+      const bw = g.measureText(o.badge).width + 56;
+      g.strokeStyle = GOLD; g.lineWidth = 2;
+      adRoundRect(g, W / 2 - bw / 2, y, bw, 56, 28); g.stroke();
+      g.fillStyle = GOLD2; g.fillText(o.badge, W / 2, y + 38);
+      y += (o.story ? 92 : 70);
+    } else { y += (o.story ? 40 : 26); }
+
+    /* foto (ou placeholder tracejado) */
+    const boxW = W - 300, boxH = o.story ? 650 : 410;
+    if (o.foto) {
+      const sc = Math.min(boxW / o.foto.width, boxH / o.foto.height);
+      const fw = o.foto.width * sc, fh = o.foto.height * sc;
+      g.save();
+      g.shadowColor = "rgba(0,0,0,.55)"; g.shadowBlur = 46; g.shadowOffsetY = 22;
+      g.drawImage(o.foto, (W - fw) / 2, y, fw, fh);
+      g.restore();
+      g.fillStyle = "rgba(13,13,16,.82)";
+      adRoundRect(g, W / 2 - 128, y + fh - 22, 256, 52, 26); g.fill();
+      g.strokeStyle = GOLD; g.lineWidth = 2;
+      adRoundRect(g, W / 2 - 128, y + fh - 22, 256, 52, 26); g.stroke();
+      g.fillStyle = GOLD2; g.font = "600 26px Oswald, sans-serif";
+      g.fillText("PREMIUM 1.1 · P AO G1", W / 2, y + fh + 13);
+      y += fh + (o.story ? 130 : 104);
+    } else {
+      g.save();
+      g.setLineDash([16, 12]); g.strokeStyle = "rgba(201,162,75,.55)"; g.lineWidth = 3;
+      adRoundRect(g, (W - boxW) / 2, y, boxW, boxH, 18); g.stroke();
+      g.restore();
+      g.fillStyle = INK2; g.font = "600 40px Oswald, sans-serif";
+      g.fillText("FOTO DA CAMISA", W / 2, y + boxH / 2 - 8);
+      g.fillStyle = "rgba(255,255,255,.45)"; g.font = "400 26px Inter, sans-serif";
+      g.fillText("suba a foto no campo ao lado", W / 2, y + boxH / 2 + 34);
+      y += boxH + (o.story ? 130 : 104);
+    }
+
+    /* preço + combo */
+    g.fillStyle = GOLD2; g.font = "700 104px Oswald, sans-serif";
+    g.fillText("R$ " + o.preco, W / 2, y);
+    g.fillStyle = INK2; g.font = "500 32px Oswald, sans-serif";
+    g.fillText("A UNIDADE", W / 2, y + 44);
+    y += o.story ? 118 : 92;
+    if (o.comboOk) {
+      const pw = 560, ph = 76;
+      const pg = g.createLinearGradient(W / 2 - pw / 2, 0, W / 2 + pw / 2, 0);
+      pg.addColorStop(0, "#8A6D2B"); pg.addColorStop(.45, GOLD); pg.addColorStop(.62, GOLD2); pg.addColorStop(1, "#B8891F");
+      g.fillStyle = pg; adRoundRect(g, W / 2 - pw / 2, y - ph / 2, pw, ph, ph / 2); g.fill();
+      g.fillStyle = "#1a1206"; g.font = "700 38px Oswald, sans-serif";
+      g.fillText("2 CAMISAS POR R$ " + CONFIG.precoCombo, W / 2, y + 13);
+    }
+
+    /* rodapé */
+    const baseY = H - (o.story ? 150 : 118);
+    g.strokeStyle = "rgba(201,162,75,.5)"; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(W / 2 - 200, baseY - 56); g.lineTo(W / 2 + 200, baseY - 56); g.stroke();
+    g.fillStyle = GOLD2; g.font = "600 32px Oswald, sans-serif";
+    g.fillText("VISTA SUA PAIXÃO. MOSTRE SEU ESTILO.", W / 2, baseY);
+    g.fillStyle = INK2; g.font = "400 28px Inter, sans-serif";
+    g.fillText("@lscolletion00  ·  WhatsApp (11) 94773-9081", W / 2, baseY + 44);
+  }
+
+  /* ============================================================
+     NOVA CAMISA — anúncio de lançamento (foto enviada pelo dono)
+     ============================================================ */
+  function initLancamento() {
+    const file = $("lcFoto"), nome = $("lcNome"), versao = $("lcVersao"), precoEl = $("lcPreco"),
+          fmt = $("lcFmt"), gancho = $("lcGancho"), cv = $("lcCanvas");
+    if (!cv || !file) return;
+
+    let fotoImg = null;
+    file.addEventListener("change", () => {
+      const f = file.files && file.files[0];
+      if (!f) { fotoImg = null; draw(); return; }
+      const r = new FileReader();
+      r.onload = () => { const i = new Image(); i.onload = () => { fotoImg = i; draw(); }; i.src = r.result; };
+      r.readAsDataURL(f);
+    });
+
+    versao.addEventListener("change", () => {
+      precoEl.value = versao.selectedOptions[0].dataset.preco || 140;
+      draw();
+    });
+    fmt.addEventListener("change", draw);
+    [nome, gancho, precoEl].forEach(el => el.addEventListener("input", () => {
+      clearTimeout(el._t); el._t = setTimeout(draw, 300);
+    }));
+
+    const precoAtual = () => Number(precoEl.value) || Number(CONFIG.precoUnit);
+
+    async function draw() {
+      await pintarAnuncio(cv, {
+        story: fmt.value === "story",
+        gancho: gancho.value.trim() || "CHEGOU NA LS COLLECTION",
+        titulo: "CAMISA " + (nome.value.trim() || "NOVA").toUpperCase(),
+        badge: "LANÇAMENTO · VERSÃO " + versao.value.toUpperCase(),
+        foto: fotoImg,
+        preco: precoAtual(),
+        comboOk: precoAtual() === Number(CONFIG.precoUnit),
+      });
+    }
+
+    function legendaLancamento() {
+      const n = nome.value.trim() || "nova";
+      const tag = n.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
+      const p = precoAtual();
+      return [
+        `🚨 CHEGOU NA LS COLLECTION!`,
+        "",
+        `CAMISA ${n.toUpperCase()} — versão ${versao.value} Premium 1.1`,
+        "Do P ao G1, qualidade que se sente no tecido e no caimento.",
+        "",
+        `💰 R$ ${p} a unidade`,
+        ...(p === Number(CONFIG.precoUnit) ? [`🔥 Combo: 2 camisas por R$ ${CONFIG.precoCombo}`] : []),
+        "📦 Envio com rastreio pra todo o Brasil",
+        "📍 São Paulo: entrega no mesmo dia",
+        "",
+        `Garanta a sua antes de esgotar 👉 WhatsApp (11) 94773-9081`,
+        "",
+        `#lancamento #${tag} #camisadetime #futebol #lscollection`,
+      ].join("\n");
+    }
+
+    $("lcDown")?.addEventListener("click", () => {
+      if (!nome.value.trim()) { toast("Dá um nome pra camisa antes de baixar."); return; }
+      if (!fotoImg) { toast("Suba a foto da camisa primeiro."); return; }
+      const slug = nome.value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      cv.toBlob((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = `lancamento-${slug}-${fmt.value}.png`; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        toast("Arte de lançamento baixada 🚀");
+      }, "image/png");
+    });
+    $("lcCopy")?.addEventListener("click", () => {
+      navigator.clipboard?.writeText(legendaLancamento());
+      toast("Legenda de lançamento copiada.");
+    });
+
+    draw();
+  }
+
+  /* ============================================================
      CRIAR ANÚNCIO — arte PNG no padrão da marca (canvas, sem libs)
      ============================================================ */
   function initAdMaker() {
@@ -707,6 +912,7 @@
     if (av) av.hidden = false;
     renderAll();
     initAdMaker();
+    initLancamento();
   }
   function showLogin() {
     const lv = $("loginView"), av = $("appView");

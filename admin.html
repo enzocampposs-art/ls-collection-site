@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/admin.css?v=6" />
+  <link rel="stylesheet" href="css/admin.css?v=7" />
 </head>
 <body>
 
@@ -61,6 +61,10 @@
         <button class="sb__item" data-sec="produtos" data-title="Produtos">
           <svg viewBox="0 0 24 24"><path d="M16.5 3 12 5 7.5 3 3 6l2 3 2-.7V20h10V8.3l2 .7 2-3-4.5-3Z"/></svg>
           Produtos
+        </button>
+        <button class="sb__item" data-sec="lancamento" data-title="Nova Camisa">
+          <svg viewBox="0 0 24 24"><path d="M16.5 3 12 5 7.5 3 3 6l2 3 2-.7V20h10V8.3l2 .7 2-3-4.5-3Z"/><path d="M19 14v6"/><path d="M16 17h6"/></svg>
+          Nova Camisa
         </button>
         <button class="sb__item" data-sec="pedidos" data-title="Pedidos">
           <svg viewBox="0 0 24 24"><path d="M6 3h12l1 5H5l1-5Z"/><path d="M5 8h14v13H5z"/><path d="M9 12h6"/></svg>
@@ -159,6 +163,44 @@
           <div class="card">
             <div class="tablewrap"><table class="table" id="prodTable"></table></div>
             <p class="mocknote">Catálogo lido direto do site (script.js). Edições ficam só nesta sessão — serão conectadas ao backend.</p>
+          </div>
+        </section>
+
+        <!-- NOVA CAMISA (anúncio de lançamento) -->
+        <section class="panel" data-panel="lancamento">
+          <div class="card ad__card">
+            <div class="card__head"><h2>Anunciar camisa nova</h2><span class="card__hint">chegou camisa? suba a foto e o anúncio sai pronto</span></div>
+            <div class="ad__grid">
+              <div class="ad__form">
+                <label class="field"><span>Foto da camisa *</span>
+                  <input type="file" id="lcFoto" accept="image/*" />
+                </label>
+                <label class="field"><span>Time / modelo *</span><input id="lcNome" maxlength="32" placeholder="Ex.: Milan Retrô 2007" /></label>
+                <div class="ad__row2">
+                  <label class="field"><span>Versão</span>
+                    <select id="lcVersao">
+                      <option value="Torcedor" data-preco="140">Torcedor · R$ 140</option>
+                      <option value="Jogador" data-preco="210">Jogador · R$ 210</option>
+                      <option value="Retrô" data-preco="200">Retrô · R$ 200</option>
+                    </select>
+                  </label>
+                  <label class="field"><span>Preço (R$)</span><input id="lcPreco" type="number" min="1" value="140" /></label>
+                </div>
+                <label class="field"><span>Formato</span>
+                  <select id="lcFmt">
+                    <option value="feed">Feed Instagram · 1080×1350</option>
+                    <option value="story">Story / Status · 1080×1920</option>
+                  </select>
+                </label>
+                <label class="field"><span>Chamada</span><input id="lcGancho" maxlength="42" value="CHEGOU NA LS COLLECTION" /></label>
+                <div class="ad__actions">
+                  <button class="btn-gold" id="lcDown" type="button">⬇ Baixar arte (PNG)</button>
+                  <button class="btn-line" id="lcCopy" type="button">Copiar legenda</button>
+                </div>
+                <p class="mocknote">A arte é pro anúncio (Instagram/WhatsApp). Pra camisa entrar no <b>site</b>, mande a foto pra agência adicionar ao catálogo.</p>
+              </div>
+              <div class="ad__preview"><canvas id="lcCanvas" width="1080" height="1350" aria-label="Prévia do lançamento"></canvas></div>
+            </div>
           </div>
         </section>
 
@@ -329,7 +371,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- script.js primeiro: reusa PRODUTOS/CONFIG reais do site (funções da home se auto-desativam aqui) -->
-  <script src="js/script.js?v=6"></script>
-  <script src="js/admin.js?v=6"></script>
+  <script src="js/script.js?v=7"></script>
+  <script src="js/admin.js?v=7"></script>
 </body>
 </html>

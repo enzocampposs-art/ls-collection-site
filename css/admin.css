@@ -79,6 +79,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: none;
 .field select:focus { outline: none; border-color: var(--a-gold); box-shadow: 0 0 0 3px rgba(201,162,75,.18); }
 
 /* ===== Criar anúncio (gerador de arte) ===== */
+.ad__row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field input[type="file"] { padding: 9px 10px; cursor: pointer; }
+.field input[type="file"]::file-selector-button {
+  background: #C9A24B; color: #1a1206; border: 0; border-radius: 8px;
+  padding: 7px 12px; margin-right: 10px; font: inherit; font-size: .82rem; font-weight: 600; cursor: pointer;
+}
 .ad__grid { display: grid; grid-template-columns: 330px 1fr; gap: 22px; align-items: start; }
 .ad__check { display: flex; align-items: center; gap: 9px; color: var(--a-muted); font-size: .86rem; margin: 2px 0 14px; cursor: pointer; }
 .ad__check input { width: 17px; height: 17px; accent-color: #C9A24B; }
