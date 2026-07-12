@@ -268,13 +268,17 @@ h1, h2, h3, h4 { font-family: 'Oswald', 'Inter', sans-serif; font-weight: 600; l
 .promo__stats span { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,.7); }
 
 @media (max-width: 760px) {
-  .promo { background-position: center 58%; min-height: clamp(420px, 74vh, 560px); }
-  .promo__scrim { background: linear-gradient(180deg, rgba(16,14,11,.72), rgba(16,14,11,.55)); }
+  /* imagem própria pro mobile: corte sem o texto embutido da arte (banner-mobile.jpg) */
+  .promo { background-image: url('../assets/banner-mobile.jpg'); background-position: center 24%; min-height: clamp(430px, 72vh, 560px); }
+  .promo__scrim { background: linear-gradient(180deg, rgba(16,14,11,.66) 0%, rgba(16,14,11,.55) 45%, rgba(16,14,11,.78) 100%); }
   .promo__inner { padding-left: 20px; padding-right: 20px; } /* respiro lateral consistente com o container mobile */
   .promo__copy { display: block; max-width: 100%; text-align: center; margin: 0 auto; }
   .promo__actions { justify-content: center; }
+  .promo__actions .btn { width: 100%; } /* CTAs empilhados, área de toque cheia */
   .promo__sub { margin-left: auto; margin-right: auto; }
-  .promo__stats { justify-content: center; }
+  .promo__stats { justify-content: center; gap: 10px 18px; }
+  .promo__stats li { padding-left: 11px; }
+  .promo__stats strong { font-size: 1rem; }
 }
 
 /* hero (claro) */
