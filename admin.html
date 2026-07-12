@@ -15,12 +15,12 @@
 </head>
 <body>
 
-  <!-- ===================== LOGIN (visual — TODO: backend real) ===================== -->
-  <div class="login" id="loginView" hidden>
+  <!-- ===================== LOGIN — porta de entrada (senha validada no Apps Script) ===================== -->
+  <div class="login" id="loginView">
     <div class="login__card">
       <img src="assets/logo.png" alt="LS Collection" class="login__logo" />
       <h1 class="login__title">Painel <span class="gold">LS Collection</span></h1>
-      <p class="login__sub">Gestão da loja — vendas, pedidos, produtos e campanhas.</p>
+      <p class="login__sub" id="loginSub">Gestão da loja — vendas, pedidos, produtos e campanhas.</p>
       <form id="loginForm" autocomplete="off">
         <label class="field">
           <span>E-mail</span>
@@ -30,7 +30,11 @@
           <span>Senha</span>
           <input type="password" id="loginPass" placeholder="••••••••" required />
         </label>
-        <button type="submit" class="btn-gold btn-block">Entrar no painel</button>
+        <label class="field" id="loginPass2Wrap" hidden>
+          <span>Confirmar senha</span>
+          <input type="password" id="loginPass2" placeholder="••••••••" />
+        </label>
+        <button type="submit" class="btn-gold btn-block" id="loginBtn">Entrar no painel</button>
       </form>
       <p class="login__warn">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
@@ -41,7 +45,7 @@
   </div>
 
   <!-- ===================== PAINEL ===================== -->
-  <div class="app" id="appView">
+  <div class="app" id="appView" hidden>
 
     <!-- Sidebar -->
     <aside class="sb" id="sidebar" aria-label="Menu do painel">

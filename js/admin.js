@@ -13,12 +13,17 @@
      Sem URL configurada, o painel roda em modo demonstração (login aberto + dados fictícios).
      Com URL salva (aba Configurações), o login exige a senha definida no Apps Script
      e as tabelas passam a ler a planilha de verdade. */
-  const API_KEY = "ls_admin_api";      // localStorage: URL /exec do Apps Script
-  const TOKEN_KEY = "ls_admin_token";  // sessionStorage: senha validada nesta sessão
+  /* conexão oficial do painel (App da Web da planilha da LS Collection).
+     A senha NÃO fica aqui — é digitada no login e validada pelo Apps Script. */
+  const API_URL_FIXA = "https://script.google.com/macros/s/AKfycbxDAk6qGXJFb2DjnQnry4FjsGlwrW-fQctv4u2yIRJiao5aG4WtnnVI86u3jZemRYgqNQ/exec";
+
+  const API_KEY = "ls_admin_api";      // localStorage: URL alternativa (troca de implantação sem editar código)
+  const CRED_KEY = "ls_admin_cred";    // sessionStorage: credencial validada nesta sessão
   const SESSION_KEY = "ls_admin_logged";
 
-  const apiUrl = () => (localStorage.getItem(API_KEY) || "").trim();
-  const apiToken = () => sessionStorage.getItem(TOKEN_KEY) || "";
+  const apiUrl = () => (localStorage.getItem(API_KEY) || "").trim() || API_URL_FIXA;
+  function getCred() { try { return JSON.parse(sessionStorage.getItem(CRED_KEY) || "null"); } catch (e) { return null; } }
+  function setCred(c) { sessionStorage.setItem(CRED_KEY, JSON.stringify(c)); }
 
   async function apiGet(params) {
     const url = apiUrl();
@@ -28,29 +33,59 @@
     return res.json();
   }
 
-  async function adminLogin(email, pass) {
-    void email; // reservado pra multiusuário no futuro
-    if (!apiUrl()) { // modo demonstração
-      sessionStorage.setItem(SESSION_KEY, "1");
-      return { ok: true, demo: true };
-    }
+  /* descobre a versão da API: v2 tem "primeiro acesso"; script antigo cai no login por senha única */
+  let apiInfo = null, apiInfoPromise = null;
+  function apiStatus() {
+    if (apiInfoPromise) return apiInfoPromise;
+    apiInfoPromise = (async () => {
+      try {
+        const r = await apiGet({ action: "status" });
+        apiInfo = (r && r.ok && r.v === 2) ? { v2: true, configurado: !!r.configurado } : { v2: false, configurado: true };
+      } catch (err) {
+        apiInfo = { v2: false, configurado: true };
+      }
+      return apiInfo;
+    })();
+    return apiInfoPromise;
+  }
+
+  async function adminLogin(email, senha) {
+    const st = await apiStatus();
     try {
-      const r = await apiGet({ action: "ping", token: pass });
+      if (st.v2) {
+        const r = await apiGet({ action: "login", email, senha });
+        if (r && r.ok) { setCred({ email, senha }); sessionStorage.setItem(SESSION_KEY, "1"); return { ok: true }; }
+        return { ok: false, erro: (r && r.erro) || "E-mail ou senha incorretos." };
+      }
+      /* script antigo (senha única no código) */
+      const r = await apiGet({ action: "ping", token: senha });
+      if (r && r.ok) { setCred({ token: senha }); sessionStorage.setItem(SESSION_KEY, "1"); return { ok: true }; }
+      return { ok: false, erro: (r && r.erro) || "Senha incorreta." };
+    } catch (err) {
+      return { ok: false, erro: "Não consegui falar com a planilha. Confira sua internet e a URL em Configurações." };
+    }
+  }
+
+  /* primeiro acesso — cria a conta do dono (só funciona uma vez, ver planilha-painel.gs) */
+  async function adminRegistrar(email, senha) {
+    try {
+      const r = await apiGet({ action: "registrar", email, senha });
       if (r && r.ok) {
-        sessionStorage.setItem(SESSION_KEY, "1");
-        sessionStorage.setItem(TOKEN_KEY, pass);
+        setCred({ email, senha }); sessionStorage.setItem(SESSION_KEY, "1");
+        apiInfo = { v2: true, configurado: true };
         return { ok: true };
       }
-      return { ok: false, erro: "Senha incorreta. Confira a senha definida no Apps Script." };
+      return { ok: false, erro: (r && r.erro) || "Não foi possível criar a conta." };
     } catch (err) {
-      return { ok: false, erro: "Não consegui falar com a planilha. Confira a URL em Configurações." };
+      return { ok: false, erro: "Não consegui falar com a planilha. Confira sua internet." };
     }
   }
+
   function adminLogout() {
     sessionStorage.removeItem(SESSION_KEY);
-    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(CRED_KEY);
   }
-  function isLogged() { return sessionStorage.getItem(SESSION_KEY) === "1"; }
+  function isLogged() { return sessionStorage.getItem(SESSION_KEY) === "1" && !!getCred(); }
 
   /* ============================================================
      MOCKS — substituir pela API
@@ -219,9 +254,11 @@
   }
 
   async function fetchData() {
-    if (!apiUrl() || !apiToken()) return false;
+    const cred = getCred();
+    if (!apiUrl() || !cred) return false;
     try {
-      const d = await apiGet({ token: apiToken() });
+      const params = cred.token ? { token: cred.token } : { action: "dados", email: cred.email, senha: cred.senha };
+      const d = await apiGet(params);
       if (d && d.ok) { applySheetData(d); return true; }
     } catch (err) { /* mantém mocks */ }
     return false;
@@ -510,26 +547,50 @@
        independente do estado do login — evita painel vazio */
     renderAll();
 
-    /* login (valida a senha na planilha quando a conexão está configurada;
-       sem conexão, entra em modo demonstração) */
+    /* card de login: vira "Primeiro acesso" quando o Apps Script v2 ainda não tem conta criada */
+    let loginMode = "entrar";
+    (async function setupLoginCard() {
+      const st = await apiStatus();
+      if (st.v2 && !st.configurado) {
+        loginMode = "registrar";
+        const sub = $("loginSub"), btn = $("loginBtn"), wrap = $("loginPass2Wrap");
+        if (sub) sub.textContent = "Primeiro acesso: crie o e-mail e a senha do dono. Isso acontece uma única vez.";
+        if (btn) btn.textContent = "Criar conta e entrar";
+        if (wrap) wrap.hidden = false;
+      }
+    })();
+
+    /* login / primeiro acesso — validado no Apps Script da planilha */
     $("loginForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const btn = e.target.querySelector("button[type=submit]");
-      if (btn) { btn.disabled = true; btn.textContent = "Entrando…"; }
-      const r = await adminLogin($("loginEmail").value, $("loginPass").value);
-      if (btn) { btn.disabled = false; btn.textContent = "Entrar no painel"; }
+      const btn = $("loginBtn");
+      const email = $("loginEmail").value.trim();
+      const senha = $("loginPass").value;
+      const rotulo = loginMode === "registrar" ? "Criar conta e entrar" : "Entrar no painel";
+
+      if (loginMode === "registrar") {
+        if (senha.length < 6) { toast("A senha precisa de pelo menos 6 caracteres."); return; }
+        if (senha !== ($("loginPass2")?.value || "")) { toast("As senhas não conferem."); return; }
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = loginMode === "registrar" ? "Criando conta…" : "Entrando…"; }
+      const r = loginMode === "registrar" ? await adminRegistrar(email, senha) : await adminLogin(email, senha);
+      if (btn) { btn.disabled = false; btn.textContent = rotulo; }
       if (!r.ok) { toast(r.erro || "Não foi possível entrar."); return; }
+
       showApp();
-      toast(r.demo ? "Painel em modo demonstração — conecte a planilha em Configurações." : "Bem-vindo ao painel da LS Collection 👑");
-      if (!r.demo) { const ok = await fetchData(); if (ok) renderAll(); }
+      toast(loginMode === "registrar" ? "Conta do dono criada — bem-vindo ao painel 👑" : "Bem-vindo ao painel da LS Collection 👑");
+      loginMode = "entrar";
+      const ok = await fetchData();
+      if (ok) renderAll();
     });
     $("btnLogout")?.addEventListener("click", () => { adminLogout(); showLogin(); });
+    /* porta de entrada: login sempre primeiro; painel só com sessão validada */
     if (isLogged()) {
       showApp();
       fetchData().then(ok => { if (ok) renderAll(); });
-    } else if (!$("appView").hidden) {
-      /* painel aberto sem sessão (acesso direto) — dados da planilha se houver conexão salva */
-      fetchData().then(ok => { if (ok) renderAll(); });
+    } else {
+      showLogin();
     }
 
     /* navegação */
@@ -585,7 +646,7 @@
 
     /* fretes: relê a planilha quando conectado */
     $("fretRefresh")?.addEventListener("click", async () => {
-      if (apiUrl() && apiToken()) {
+      if (apiUrl() && getCred()) {
         const ok = await fetchData();
         if (ok) { renderAll(); toast("Dados atualizados direto da planilha ✓"); }
         else toast("Não consegui ler a planilha agora — tenta de novo.");
