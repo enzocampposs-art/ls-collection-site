@@ -72,6 +72,20 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: none;
 .field input::placeholder { color: var(--a-muted); }
 .field input:focus { outline: none; border-color: var(--a-gold); box-shadow: 0 0 0 3px rgba(201,162,75,.18); }
 .field input:disabled { opacity: .6; cursor: not-allowed; }
+.field select {
+  width: 100%; background: var(--a-bg2, #1a1a1e); border: 1px solid var(--a-line, #2a2a30); border-radius: 10px;
+  padding: 11px 12px; color: var(--a-ink, #ececf1); font: inherit; font-size: .95rem;
+}
+.field select:focus { outline: none; border-color: var(--a-gold); box-shadow: 0 0 0 3px rgba(201,162,75,.18); }
+
+/* ===== Criar anúncio (gerador de arte) ===== */
+.ad__grid { display: grid; grid-template-columns: 330px 1fr; gap: 22px; align-items: start; }
+.ad__check { display: flex; align-items: center; gap: 9px; color: var(--a-muted); font-size: .86rem; margin: 2px 0 14px; cursor: pointer; }
+.ad__check input { width: 17px; height: 17px; accent-color: #C9A24B; }
+.ad__actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.ad__preview { background: #0a0a0c; border: 1px solid var(--a-line, #2a2a30); border-radius: 12px; padding: 16px; display: flex; justify-content: center; }
+.ad__preview canvas { width: 100%; max-width: 350px; height: auto; border-radius: 8px; box-shadow: 0 14px 34px rgba(0,0,0,.5); }
+@media (max-width: 860px) { .ad__grid { grid-template-columns: 1fr; } .ad__preview canvas { max-width: 300px; } }
 
 /* ============================================================
    LOGIN

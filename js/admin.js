@@ -495,6 +495,179 @@
     }
   }
 
+  /* ============================================================
+     CRIAR ANÚNCIO — arte PNG no padrão da marca (canvas, sem libs)
+     ============================================================ */
+  function initAdMaker() {
+    const sel = $("adProd"), fmt = $("adFmt"), gancho = $("adGancho"), combo = $("adCombo"), cv = $("adCanvas");
+    if (!sel || !cv) return;
+
+    sel.innerHTML = catalogo.map(p =>
+      `<option value="${p.team}">${p.team} — R$ ${p.preco || CONFIG.precoUnit}</option>`).join("");
+
+    const cache = {};
+    const loadImg = (src) => new Promise((res) => {
+      if (cache[src]) return res(cache[src]);
+      const i = new Image();
+      i.onload = () => { cache[src] = i; res(i); };
+      i.onerror = () => res(null);
+      i.src = src;
+    });
+
+    const prodAtual = () => catalogo.find(x => x.team === sel.value) || catalogo[0];
+
+    /* desenha a arte no padrão do design guide: preto + dourado, logo, camisa, preço */
+    async function draw() {
+      const p = prodAtual();
+      const story = fmt.value === "story";
+      const W = 1080, H = story ? 1920 : 1350;
+      cv.width = W; cv.height = H;
+      const g = cv.getContext("2d");
+      try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+      const [logo, foto] = await Promise.all([loadImg("assets/logo.png"), loadImg(p.img)]);
+
+      const GOLD = "#C9A24B", GOLD2 = "#F3D98A", INK2 = "rgba(255,255,255,.72)";
+      const preco = p.preco || Number(CONFIG.precoUnit);
+      const temCombo = combo.checked && preco === Number(CONFIG.precoUnit);
+
+      /* fundo premium + brilho dourado + moldura */
+      g.fillStyle = "#0D0D10"; g.fillRect(0, 0, W, H);
+      const rg = g.createRadialGradient(W / 2, H * 0.44, 60, W / 2, H * 0.44, W * 0.78);
+      rg.addColorStop(0, "rgba(201,162,75,.26)"); rg.addColorStop(1, "rgba(201,162,75,0)");
+      g.fillStyle = rg; g.fillRect(0, 0, W, H);
+      const frame = g.createLinearGradient(0, 0, W, H);
+      frame.addColorStop(0, "#8A6D2B"); frame.addColorStop(.5, GOLD2); frame.addColorStop(1, "#B8891F");
+      g.strokeStyle = frame; g.lineWidth = 4; g.strokeRect(30, 30, W - 60, H - 60);
+
+      let y = story ? 120 : 88;
+
+      /* logo */
+      if (logo) {
+        const lw = 260, lh = lw * (logo.height / logo.width);
+        g.drawImage(logo, (W - lw) / 2, y, lw, lh);
+        y += lh + (story ? 56 : 34);
+      }
+
+      /* chamada opcional */
+      const hook = gancho.value.trim();
+      if (hook) {
+        g.fillStyle = GOLD2; g.font = "600 40px Oswald, sans-serif"; g.textAlign = "center";
+        g.fillText(hook.toUpperCase(), W / 2, y + 30); y += (story ? 76 : 62);
+      }
+
+      /* título (quebra em 2 linhas se precisar) */
+      g.fillStyle = "#fff"; g.textAlign = "center";
+      const titulo = "CAMISA " + p.team.toUpperCase();
+      let fs = 92; g.font = `700 ${fs}px Oswald, sans-serif`;
+      const palavras = titulo.split(" "); let linhas = [titulo];
+      if (g.measureText(titulo).width > W - 180) {
+        const meio = Math.ceil(palavras.length / 2);
+        linhas = [palavras.slice(0, meio).join(" "), palavras.slice(meio).join(" ")];
+        fs = 76; g.font = `700 ${fs}px Oswald, sans-serif`;
+        while (linhas.some(l => g.measureText(l).width > W - 180) && fs > 48) { fs -= 4; g.font = `700 ${fs}px Oswald, sans-serif`; }
+      }
+      linhas.forEach((l, i) => g.fillText(l, W / 2, y + fs * (i + 0.9)));
+      y += fs * linhas.length + (story ? 60 : 36);
+
+      /* foto da camisa (contida, com sombra) */
+      if (foto) {
+        const boxW = W - 300, boxH = story ? 760 : 520;
+        const sc = Math.min(boxW / foto.width, boxH / foto.height);
+        const fw = foto.width * sc, fh = foto.height * sc;
+        g.save();
+        g.shadowColor = "rgba(0,0,0,.55)"; g.shadowBlur = 46; g.shadowOffsetY = 22;
+        g.drawImage(foto, (W - fw) / 2, y, fw, fh);
+        g.restore();
+        /* selo premium sobre a foto */
+        g.fillStyle = "rgba(13,13,16,.82)";
+        roundRect(g, W / 2 - 128, y + fh - 22, 256, 52, 26); g.fill();
+        g.strokeStyle = GOLD; g.lineWidth = 2;
+        roundRect(g, W / 2 - 128, y + fh - 22, 256, 52, 26); g.stroke();
+        g.fillStyle = GOLD2; g.font = "600 26px Oswald, sans-serif";
+        g.fillText("PREMIUM 1.1 · P AO G1", W / 2, y + fh + 13);
+        y += fh + (story ? 130 : 108);
+      }
+
+      /* preço */
+      g.fillStyle = GOLD2; g.font = "700 108px Oswald, sans-serif";
+      const precoTxt = "R$ " + preco;
+      g.fillText(precoTxt, W / 2, y);
+      g.fillStyle = INK2; g.font = "500 34px Oswald, sans-serif";
+      g.fillText("A UNIDADE", W / 2, y + 46);
+      y += story ? 120 : 96;
+
+      /* pill do combo */
+      if (temCombo) {
+        const pw = 560, ph = 78;
+        const pg = g.createLinearGradient(W / 2 - pw / 2, 0, W / 2 + pw / 2, 0);
+        pg.addColorStop(0, "#8A6D2B"); pg.addColorStop(.45, GOLD); pg.addColorStop(.62, GOLD2); pg.addColorStop(1, "#B8891F");
+        g.fillStyle = pg; roundRect(g, W / 2 - pw / 2, y - ph / 2, pw, ph, ph / 2); g.fill();
+        g.fillStyle = "#1a1206"; g.font = "700 40px Oswald, sans-serif";
+        g.fillText("2 CAMISAS POR R$ " + CONFIG.precoCombo, W / 2, y + 14);
+        y += story ? 110 : 88;
+      }
+
+      /* rodapé: tagline + contato */
+      const baseY = H - (story ? 150 : 120);
+      g.strokeStyle = "rgba(201,162,75,.5)"; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(W / 2 - 200, baseY - 58); g.lineTo(W / 2 + 200, baseY - 58); g.stroke();
+      g.fillStyle = GOLD2; g.font = "600 32px Oswald, sans-serif";
+      g.fillText("VISTA SUA PAIXÃO. MOSTRE SEU ESTILO.", W / 2, baseY);
+      g.fillStyle = INK2; g.font = "400 28px Inter, sans-serif";
+      g.fillText("@lscolletion00  ·  WhatsApp (11) 94773-9081", W / 2, baseY + 46);
+    }
+
+    function roundRect(g, x, y, w, h, r) {
+      g.beginPath();
+      g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+      g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+    }
+
+    /* legenda pronta pra copiar */
+    function legenda() {
+      const p = prodAtual();
+      const preco = p.preco || Number(CONFIG.precoUnit);
+      const temCombo = combo.checked && preco === Number(CONFIG.precoUnit);
+      const tag = p.team.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
+      return [
+        `🖤💛 CAMISA ${p.team.toUpperCase()} — PREMIUM 1.1`,
+        "",
+        "Qualidade que se sente no tecido e no caimento. Do P ao G1.",
+        "",
+        `💰 R$ ${preco} a unidade`,
+        ...(temCombo ? [`🔥 Combo: 2 camisas por R$ ${CONFIG.precoCombo}`] : []),
+        "📦 Envio com rastreio pra todo o Brasil",
+        "📍 São Paulo: entrega no mesmo dia",
+        "",
+        `Garanta a sua 👉 WhatsApp (11) 94773-9081`,
+        "",
+        `#${tag} #camisadetime #futebol #lscollection #vistasuapaixao`,
+      ].join("\n");
+    }
+
+    /* eventos */
+    [sel, fmt, combo].forEach(el => el.addEventListener("change", draw));
+    gancho.addEventListener("input", () => { clearTimeout(gancho._t); gancho._t = setTimeout(draw, 300); });
+
+    $("adDown")?.addEventListener("click", () => {
+      const p = prodAtual();
+      const nome = `anuncio-${p.team.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${fmt.value}.png`;
+      cv.toBlob((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = nome; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        toast("Arte baixada — pronta pra postar 🎉");
+      }, "image/png");
+    });
+
+    $("adCopy")?.addEventListener("click", () => {
+      navigator.clipboard?.writeText(legenda());
+      toast("Legenda copiada — cola direto no Instagram/WhatsApp.");
+    });
+
+    draw();
+  }
+
   function renderAll() {
     renderKPIs();
     renderBars("dashVendas"); renderBars("repVendas");
@@ -533,6 +706,7 @@
     if (lv) lv.hidden = true;
     if (av) av.hidden = false;
     renderAll();
+    initAdMaker();
   }
   function showLogin() {
     const lv = $("loginView"), av = $("appView");

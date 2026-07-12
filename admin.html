@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/admin.css?v=5" />
+  <link rel="stylesheet" href="css/admin.css?v=6" />
 </head>
 <body>
 
@@ -237,6 +237,29 @@
 
         <!-- ANÚNCIOS -->
         <section class="panel" data-panel="anuncios">
+          <div class="card ad__card">
+            <div class="card__head"><h2>Criar anúncio</h2><span class="card__hint">arte pronta no padrão da marca — baixa e posta</span></div>
+            <div class="ad__grid">
+              <div class="ad__form">
+                <label class="field"><span>Camisa</span><select id="adProd"></select></label>
+                <label class="field"><span>Formato</span>
+                  <select id="adFmt">
+                    <option value="feed">Feed Instagram · 1080×1350</option>
+                    <option value="story">Story / Status · 1080×1920</option>
+                  </select>
+                </label>
+                <label class="field"><span>Chamada (opcional)</span><input id="adGancho" maxlength="42" placeholder="Ex.: Chegou a nova do Timão" /></label>
+                <label class="ad__check"><input type="checkbox" id="adCombo" checked /> Destacar combo 2 por R$ 260 (quando válido)</label>
+                <div class="ad__actions">
+                  <button class="btn-gold" id="adDown" type="button">⬇ Baixar arte (PNG)</button>
+                  <button class="btn-line" id="adCopy" type="button">Copiar legenda</button>
+                </div>
+                <p class="mocknote">Fluxo do dono: escolhe a camisa → baixa a arte → copia a legenda → posta no Instagram ou manda no WhatsApp/Status.</p>
+              </div>
+              <div class="ad__preview"><canvas id="adCanvas" width="1080" height="1350" aria-label="Prévia do anúncio"></canvas></div>
+            </div>
+          </div>
+
           <div class="toolbar">
             <h2 class="toolbar__title">Campanhas e ideias prontas</h2>
             <button class="btn-gold" data-toast="Criação de campanha será conectada ao Meta Ads / Google Ads.">+ Criar campanha</button>
@@ -306,7 +329,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- script.js primeiro: reusa PRODUTOS/CONFIG reais do site (funções da home se auto-desativam aqui) -->
-  <script src="js/script.js?v=5"></script>
-  <script src="js/admin.js?v=5"></script>
+  <script src="js/script.js?v=6"></script>
+  <script src="js/admin.js?v=6"></script>
 </body>
 </html>
