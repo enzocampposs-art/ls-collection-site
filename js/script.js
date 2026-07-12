@@ -4,7 +4,7 @@
 
 const CONFIG = {
   whatsapp: "5511947739081",
-  instagram: "https://www.instagram.com/lscolletion00",
+  instagram: "https://www.instagram.com/lscolletion00?igsh=OHdydXhhOW96NGd6&utm_source=qr",
   precoUnit: "140",
   precoCombo: "260",
 };
