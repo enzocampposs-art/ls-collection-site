@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/admin.css?v=7" />
+  <link rel="stylesheet" href="css/admin.css?v=8" />
 </head>
 <body>
 
@@ -186,6 +186,13 @@
                   </label>
                   <label class="field"><span>Preço (R$)</span><input id="lcPreco" type="number" min="1" value="140" /></label>
                 </div>
+                <label class="field"><span>Categoria no site</span>
+                  <select id="lcCat">
+                    <option value="brasileirao">Brasileirão</option>
+                    <option value="selecoes">Seleções</option>
+                    <option value="europeus">Europeus</option>
+                  </select>
+                </label>
                 <label class="field"><span>Formato</span>
                   <select id="lcFmt">
                     <option value="feed">Feed Instagram · 1080×1350</option>
@@ -194,10 +201,11 @@
                 </label>
                 <label class="field"><span>Chamada</span><input id="lcGancho" maxlength="42" value="CHEGOU NA LS COLLECTION" /></label>
                 <div class="ad__actions">
+                  <button class="btn-gold" id="lcPub" type="button">🚀 Publicar no site</button>
                   <button class="btn-gold" id="lcDown" type="button">⬇ Baixar arte (PNG)</button>
                   <button class="btn-line" id="lcCopy" type="button">Copiar legenda</button>
                 </div>
-                <p class="mocknote">A arte é pro anúncio (Instagram/WhatsApp). Pra camisa entrar no <b>site</b>, mande a foto pra agência adicionar ao catálogo.</p>
+                <p class="mocknote" id="lcPubNote">"Publicar no site" coloca a camisa <b>na loja de verdade</b> (catálogo, página de produto e checkout) em ~1 minuto. A foto fica salva no Drive e a camisa na aba <b>Catalogo</b> da planilha — pra tirar do ar, mude a coluna Ativo pra NAO.</p>
               </div>
               <div class="ad__preview"><canvas id="lcCanvas" width="1080" height="1350" aria-label="Prévia do lançamento"></canvas></div>
             </div>
@@ -371,7 +379,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- script.js primeiro: reusa PRODUTOS/CONFIG reais do site (funções da home se auto-desativam aqui) -->
-  <script src="js/script.js?v=7"></script>
-  <script src="js/admin.js?v=7"></script>
+  <script src="js/script.js?v=8"></script>
+  <script src="js/admin.js?v=8"></script>
 </body>
 </html>

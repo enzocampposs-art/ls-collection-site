@@ -15,6 +15,38 @@ const CONFIG = {
   pixRecebedor: "LS Collection",
 };
 
+/* camisas publicadas pelo dono via painel (aba "Catalogo" da planilha).
+   Se a planilha não responder, o site segue normal só com o catálogo fixo. */
+const CATALOGO_API = "https://script.google.com/macros/s/AKfycbxDAk6qGXJFb2DjnQnry4FjsGlwrW-fQctv4u2yIRJiao5aG4WtnnVI86u3jZemRYgqNQ/exec";
+
+async function carregarCatalogoDono() {
+  try {
+    const r = await fetch(CATALOGO_API + "?action=catalogo", { redirect: "follow" });
+    const d = await r.json();
+    if (!d || !d.ok || !Array.isArray(d.itens)) return;
+    let novos = 0;
+    d.itens.forEach((it) => {
+      const team = String(it.Time || "").trim();
+      const img = String(it.FotoURL || "").trim();
+      if (!team || !img) return;
+      if (PRODUTOS.some((p) => slugTeam(p.team) === slugTeam(team))) return; // não duplica
+      const cat = String(it.Categoria || "brasileirao").toLowerCase();
+      PRODUTOS.push({
+        team,
+        category: ["brasileirao", "selecoes", "europeus"].includes(cat) ? cat : "brasileirao",
+        img,
+        badge: String(it.Badge || "").trim() || undefined,
+        preco: Number(it.Preco) && Number(it.Preco) !== Number(CONFIG.precoUnit) ? Number(it.Preco) : undefined,
+      });
+      novos++;
+    });
+    if (novos) {
+      renderCatalog(); // home: catálogo re-renderiza com as novas
+      document.dispatchEvent(new CustomEvent("lsCatalogoExtra")); // produto/checkout re-resolvem o ?team=
+    }
+  } catch (e) { /* offline ou script antigo — site segue normal */ }
+}
+
 /* slug de time pra URLs: "Real Madrid" -> "real-madrid" (aceita acentos) */
 function slugTeam(s) {
   return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -390,6 +422,7 @@ function initShirt360() {
 /* Init */
 document.addEventListener("DOMContentLoaded", () => {
   renderCatalog();
+  carregarCatalogoDono(); // soma as camisas publicadas pelo dono (planilha)
   renderReviews();
   initCountdown();
   initNav();

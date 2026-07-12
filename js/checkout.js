@@ -16,13 +16,27 @@
   const list = (typeof PRODUTOS !== "undefined") ? PRODUTOS : [];
   /* aceita "Real Madrid", "real madrid" e "real-madrid" */
   const norm = (typeof slugTeam === "function") ? slugTeam : ((s) => String(s).toLowerCase());
-  const prod = list.find((p) => p.team.toLowerCase() === teamParam || norm(p.team) === norm(teamParam)) || list[0];
+  const acharProd = () => list.find((p) => p.team.toLowerCase() === teamParam || norm(p.team) === norm(teamParam));
+  let prod = acharProd() || list[0];
   if (!prod) return;
 
   const QTD_MAX = 10;
   const precoUnitPadrao = Number(CONFIG.precoUnit);
-  const unitPrice = prod.preco || precoUnitPadrao;
-  const comboElegivel = unitPrice === precoUnitPadrao; // só as camisas de preço padrão entram no combo 2x260
+  let unitPrice = prod.preco || precoUnitPadrao;
+  let comboElegivel = unitPrice === precoUnitPadrao; // só as camisas de preço padrão entram no combo 2x260
+
+  /* a camisa da URL pode ser publicada pelo dono (chega async da planilha) */
+  if (!acharProd()) {
+    document.addEventListener("lsCatalogoExtra", () => {
+      const achou = acharProd();
+      if (achou) {
+        prod = achou;
+        unitPrice = prod.preco || precoUnitPadrao;
+        comboElegivel = unitPrice === precoUnitPadrao;
+        renderAll();
+      }
+    }, { once: true });
+  }
 
   const state = { qtd: 1, pay: "pix", frete: null };
   const money = (n) => "R$ " + n.toFixed(2).replace(".", ",");

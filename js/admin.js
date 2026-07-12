@@ -681,6 +681,49 @@
       ].join("\n");
     }
 
+    /* PUBLICAR NO SITE — envia foto (redimensionada) + dados pra planilha via Apps Script */
+    $("lcPub")?.addEventListener("click", async () => {
+      const btn = $("lcPub");
+      if (!nome.value.trim()) { toast("Dá um nome pra camisa antes de publicar."); return; }
+      if (!fotoImg) { toast("Suba a foto da camisa primeiro."); return; }
+      const cred = getCred();
+      if (!cred || !cred.email) { toast("Entre com o e-mail e senha do dono pra publicar (saia e faça login)."); return; }
+
+      /* redimensiona pra ~900px (upload leve) */
+      const mx = 900;
+      const sc = Math.min(1, mx / Math.max(fotoImg.width, fotoImg.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(fotoImg.width * sc); c.height = Math.round(fotoImg.height * sc);
+      c.getContext("2d").drawImage(fotoImg, 0, 0, c.width, c.height);
+      const fotoBase64 = c.toDataURL("image/jpeg", 0.85);
+
+      btn.disabled = true; btn.textContent = "Publicando…";
+      try {
+        const res = await fetch(apiUrl(), {
+          method: "POST", redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, // simples: sem preflight
+          body: JSON.stringify({
+            action: "publicarProduto",
+            email: cred.email, senha: cred.senha,
+            time: nome.value.trim(),
+            categoria: $("lcCat")?.value || "brasileirao",
+            preco: precoAtual(),
+            badge: versao.value === "Torcedor" ? "Novidade" : versao.value,
+            fotoBase64,
+          }),
+        });
+        const d = await res.json();
+        if (d && d.ok) {
+          toast("Camisa publicada! Já está no site (atualize a loja pra ver) 🎉");
+        } else {
+          toast((d && d.erro) || "Não deu — confira se o Apps Script está na versão 3.");
+        }
+      } catch (err) {
+        toast("Falha de conexão com a planilha. Tenta de novo.");
+      }
+      btn.disabled = false; btn.textContent = "🚀 Publicar no site";
+    });
+
     $("lcDown")?.addEventListener("click", () => {
       if (!nome.value.trim()) { toast("Dá um nome pra camisa antes de baixar."); return; }
       if (!fotoImg) { toast("Suba a foto da camisa primeiro."); return; }
