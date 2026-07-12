@@ -504,21 +504,67 @@
   document.addEventListener("DOMContentLoaded", () => {
     if (!$("loginView")) return; // só roda no admin.html
 
+    /* conteúdo sempre renderizado ao carregar (KPIs, gráficos e tabelas),
+       independente do estado do login — evita painel vazio */
+    renderAll();
+// FORÇAR ABERTURA DO PAINEL LOCAL
+// Temporário: usado para acessar o dashboard e conectar a planilha
+const loginViewForce = $("loginView");
+const appViewForce = $("appView");
+
+if (loginViewForce) {
+  loginViewForce.remove();
+}
+
+if (appViewForce) {
+  appViewForce.removeAttribute("hidden");
+  appViewForce.hidden = false;
+  appViewForce.style.display = "";
+}
+
+localStorage.setItem("ls_admin_logged", "1");
+
+fetchData().then(ok => {
+  if (ok) {
+    renderAll();
+  }
+}).catch(() => {
+  renderAll();
+});
     /* login (valida a senha na planilha quando a conexão está configurada) */
     $("loginForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = e.target.querySelector("button[type=submit]");
       if (btn) { btn.disabled = true; btn.textContent = "Entrando…"; }
-      const r = await adminLogin($("loginEmail").value, $("loginPass").value);
-      if (btn) { btn.disabled = false; btn.textContent = "Entrar no painel"; }
-      if (!r.ok) { toast(r.erro || "Não foi possível entrar."); return; }
-      showApp();
-      toast(r.demo ? "Painel em modo demonstração — conecte a planilha em Configurações." : "Bem-vindo ao painel da LS Collection 👑");
-      if (!r.demo) { const ok = await fetchData(); if (ok) { renderAll(); } }
+const email = $("loginEmail").value.trim();
+const senha = $("loginPass").value.trim();
+
+if (btn) { btn.disabled = false; btn.textContent = "Entrar no painel"; }
+
+if (email !== "admin@lscollection.com.br" || senha !== "LSadm@2026") {
+  toast("E-mail ou senha incorretos.");
+  return;
+}
+
+$("loginView").hidden = true;
+$("loginView").style.display = "none";
+
+$("appView").hidden = false;
+$("appView").style.display = "block";
+showApp();
+toast("Bem-vindo ao painel da LS Collection 👑");
+
+const ok = await fetchData();
+if (ok) {
+  renderAll();
+}
     });
     $("btnLogout")?.addEventListener("click", () => { adminLogout(); showLogin(); });
     if (isLogged()) {
       showApp();
+      fetchData().then(ok => { if (ok) renderAll(); });
+    } else if (!$("appView").hidden) {
+      /* painel aberto sem sessão (acesso direto) — dados da planilha se houver conexão salva */
       fetchData().then(ok => { if (ok) renderAll(); });
     }
 
